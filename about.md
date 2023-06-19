@@ -1,6 +1,7 @@
 ---
 layout: page
-title: About
+title: 关于
 ---
 
-Something about me.
+本站点的所有文章、攻击方法、思路均属自创，禁止抄袭文章
+leeya_bug 2023
