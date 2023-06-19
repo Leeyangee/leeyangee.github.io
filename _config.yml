@@ -1,8 +1,8 @@
-title: Hacker-Blog
-description: "A Jekyll Blog Theme For Hackers"
+title: 渗透测试记录
+description: "记录"
 author:
-  name: "SomeHacker"
-  email: "someone@somewebsite.somedomain"
+  name: "leeya_bug"
+  email: "leeyang928320@gmail.com"
   url: "https://ashishchaudhary.in/hacker-blog"
 
 baseurl: /
@@ -28,5 +28,5 @@ plugins:
   - jekyll-sitemap
 
 # Custom variables
-owner : "SomeHacker"
-year : "2020"
+owner : "leeya_bug"
+year : "2021"
