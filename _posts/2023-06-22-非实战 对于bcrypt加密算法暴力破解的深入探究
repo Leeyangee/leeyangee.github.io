@@ -8,4 +8,6 @@ published: true
 这样的算法大大增加了我们内网渗透的难度，因此，在此深入探究一下bcrypt的密文结构，以便我以后理解  
   
 # [](#header-1)1、bcrypt密文结构
-
+一个标准的bcrypt加密密文如下所示：  
+  
+$2a$10$zpJcHwq7pBoq5k01ncu4KeOqE6mWFM/eYu9r4Ml3Q3sGRi2nUWQ4m  
