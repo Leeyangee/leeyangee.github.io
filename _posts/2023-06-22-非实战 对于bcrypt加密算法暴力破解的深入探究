@@ -11,3 +11,7 @@ published: true
 一个标准的bcrypt加密密文如下所示：  
   
 $2a$10$zpJcHwq7pBoq5k01ncu4KeOqE6mWFM/eYu9r4Ml3Q3sGRi2nUWQ4m  
+
+我们来仔细分析其结构：
+
+$2a$10$zpJcHwq7pBoq5k01ncu4KeOqE6mWFM/eYu9r4Ml3Q3sGRi2nUWQ4m  
