@@ -20,6 +20,16 @@ published: true
 
 # [](#header-1)2、上手
 隧发现插件管理处可以离线上传插件
-下载一个官方插件并解压t
-发现插件中包含
+下载一个官方插件并解压，插件中大致路径是这样的：
+```
+--README.md
+--public
+----img
+----js
+----css
+----index.html
+--controller
+----controller1.php
+----controller2.php
+```
 
