@@ -3,7 +3,7 @@ title: CVE实战 快速挖掘1k+Stars国产开源项目0day漏洞
 published: true
 ---
 # [](#header-1)0、前言
-由于src挖多了，每天盯着那一堆框架看很累，身体累、心也累、挖不到洞更累，隧决定去github上找开源项目挖凑凑cve  
+由于src挖多了，每天盯着那一堆框架看很累，挖不到洞更累，隧决定去github上找开源项目挖凑凑cve  
 然后发现某国产开源web项目，近期closed的issue比较少，就决定挖它了  
 
 # [](#header-1)1、快速资产整理
