@@ -1,4 +1,3 @@
-
 ---
 title: CVE Record
 published: true
