@@ -11,9 +11,6 @@ $header: $conifer !default;
 $blockquote-color: $silver-chalice !default;
 $blockquote-border: $dove-grey !default;
 
-a {
-   text-decoration: none;
-}
 
 body {
   margin: 0;
@@ -239,6 +236,7 @@ hr {
 */
 
 a {
+   text-decoration: none;
   color: #63c0f5;
   text-shadow: 0 0 5px rgba(104, 182, 255, 0.5);
 }
