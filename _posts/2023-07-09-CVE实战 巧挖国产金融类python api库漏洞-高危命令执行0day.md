@@ -19,6 +19,7 @@ xalpha.fundinfo("../gaoduan/PinzhongRightApi.aspx?fc=AF5097&callback=jQuery18303
 
 
 由于这两天事情多，没时间写博客，恐怕只能先看github issue了  
-https://github.com/refraction-ray/xalpha/issues/175  
+[https://github.com/refraction-ray/xalpha/issues/175]https://github.com/refraction-ray/xalpha/issues/175  
+与仓库管理者的更多对话，包括对问题的解决方案的建议都写在issue里，比较完整  
 
 
