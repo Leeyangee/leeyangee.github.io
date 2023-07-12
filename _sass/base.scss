@@ -45,6 +45,10 @@ li {
   line-height: 1.4 ;
 }
 
+li::marker{
+   color: #b5e853;
+}
+
 /* Header, <header>
    header   - container
    h1       - project name
