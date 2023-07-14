@@ -12,6 +12,7 @@ published: true
 复现：
 至少需要装python3  
 xalpha==0.11.4库可以从github上下载，但最好用pip3直接就能把库拉到本地  
+
 环境配置完毕后，执行以下代码  
 ```python
 import xalpha
