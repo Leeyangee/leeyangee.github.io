@@ -25,4 +25,6 @@ xalpha.fundinfo("../gaoduan/PinzhongRightApi.aspx?fc=AF5097&callback=jQuery18303
 [https://github.com/refraction-ray/xalpha/issues/175](https://github.com/refraction-ray/xalpha/issues/175)  
 与仓库管理者的更多对话，包括对问题的解决方案的建议都写在issue里，比较完整  
 
+比较有趣的是，repository负责人以为只是一个普通的local command execute，后来仔细想才发现，这是个api库啊！经过我后续排查，发现不少基于该项目的web项目都存在该漏洞，remote command execute
+
 
