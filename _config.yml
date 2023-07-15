@@ -28,5 +28,5 @@ plugins:
   - jekyll-sitemap
 
 # Custom variables
-owner : "leeya_bug(leeyange)"
+owner : "leeya_bug"
 year : "2021"
