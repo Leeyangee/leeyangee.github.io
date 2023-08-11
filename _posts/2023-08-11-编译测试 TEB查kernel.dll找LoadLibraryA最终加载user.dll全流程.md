@@ -27,6 +27,7 @@ published: true
 ```
 代码如下：
 ```
+xor edx, edx //清空edx
 mov ebx, fs: [edx + 0x30]		
 mov ecx, [ebx + 0x0c]			
 mov ecx, [ecx + 0x1c]			
