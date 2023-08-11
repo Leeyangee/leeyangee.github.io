@@ -21,7 +21,7 @@ published: true
         ....
       　LIST_ENTRY InInitializationOrderModuleList;// +0x1c
       } PEB_LDR_DATA,*PPEB_LDR_DATA; // +0x24
-[PEB_LDR_DATA地址 + 0x1c] -> IOM地址(模块初始化链表头指针)
+[PEB_LDR_DATA地址 + 0x1c] -> IOM地址(模块初始化链表头指针，如上所示)
 [IOM地址]                 -> ntdll.dll地址(链表第一个就是ntdll.dll)
 [ntdll.dll地址 + 0x08]    -> kernel32.dll地址
 ```
