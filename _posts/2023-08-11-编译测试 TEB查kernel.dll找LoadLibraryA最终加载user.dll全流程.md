@@ -91,4 +91,20 @@ for(int32_t i = 0; ; i ++){           // i为当前函数表中第几个函数
 
       xchg eax, ebp                 //LoadLibrary函数地址放在eax中
 }
+
+pop edi	// pushad中最后一个压入的是edi 正好是开始预留 用于存放的三个函数地址 的栈空间
+push 0x00003233                 // 压入字符'32'
+push 0x72657375                 // 压入字符 'user'
+push esp                        // 压入user32字符串地址
+stosd		// 把找到函数地址出入 edi对应的栈空间
+push edi    // 继续压栈 平衡栈
+popad		// 还原环境
+
 ```
+现在基本上就结束了，只需要call[edi - 0x8]即可
+```
+call[edi - 0x8]
+```
+eax成功返回user32.dll地址
+
+以后会总结全流程代码放在下面
