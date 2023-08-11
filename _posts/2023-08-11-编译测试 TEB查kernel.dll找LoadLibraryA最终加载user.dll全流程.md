@@ -9,8 +9,8 @@ published: true
 
 # [](#header-1)0x00、开始  
 
-众所周知，shellcode想要调用外部dll我们首先需要得到kernel.dll地址，然后根据kernel.dll PE导出表中导出函数名称表的地址获得LoadLibraryA地址  
-继而调用LoadLibraryA('xxx.dll')获得你想要调用的dll地址以调用里面的函数  
+众所周知，shellcode想要调用外部dll我们首先需要得到kernel.dll地址，然后根据kernel.dll PE导出表中导出函数名称表的地址遍历查询获得LoadLibraryA地址  
+进而继续调用LoadLibraryA('xxx.dll')获得你想要调用的dll地址以调用里面的函数  
 
 如何获得kernel.dll的地址呢？根据windbg调试信息，我们得到了以下可行的构造链:
 ```
