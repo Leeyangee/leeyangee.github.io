@@ -34,5 +34,23 @@ mov ecx, [ecx + 0x1c]
 mov ecx, [ecx]	
 mov ebp, [ecx + 0x08]
 ```
-最后ebp内即kernel32.dll地址
+最后ebp为kernel32.dll地址
+
+获得了kernel32.dll后，需要获得kernel.dll函数名称表内存虚拟地址，以查找函数名称遍历来寻找目标函数地址
+```
+[kernel.dll地址 + 0x3c]             -> 指向PE头
+[kernel.dll地址 + 指向PE头 + 0x78]   -> PE导出表地址
+kernel.dll地址 + PE导出表地址        -> PE导出表内存虚拟地址
+[PE导出表内存虚拟地址 + 0x20]         -> 导出函数名称表地址
+kernel.dll地址 + 导出函数名称表地址   -> 导出函数名称表内存虚拟地址
+```
+代码如下：
+```
+mov eax, [ebp + 0x3c]
+mov ecx, [ebp + eax + 0x78]
+add ecx, ebp
+mov ebx, [ecx + 0x20]
+add ebx, ebp
+```
+最后ebx为kernel.dll函数名称表内存虚拟地址
 
