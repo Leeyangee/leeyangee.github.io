@@ -7,7 +7,7 @@ published: true
 在编写自己的shellcode时，总会使用windbg调试  
 今天写shellcode时正好遇到了一些问题，需要调用user.dll，遂记录一下全过程  
 
-# [](#header-1)0x00、开始  
+# [](#header-1)0x01、获得kernel.dll地址
 
 众所周知，shellcode想要调用外部dll我们首先需要得到kernel.dll地址，然后根据kernel.dll PE导出表中导出函数名称表的地址遍历查询获得LoadLibraryA地址  
 进而继续调用LoadLibraryA('xxx.dll')获得你想要调用的dll地址以调用里面的函数  
@@ -34,15 +34,17 @@ mov ecx, [ecx + 0x1c]
 mov ecx, [ecx]	
 mov ebp, [ecx + 0x08]
 ```
-最后ebp为kernel32.dll地址
+最后ebp中存放kernel32.dll地址
+
+# [](#header-1)0x02、获得kernel.dll中PE导出表函数名称表地址
 
 获得了kernel32.dll后，需要获得kernel.dll函数名称表内存虚拟地址，以查找函数名称遍历来寻找目标函数地址
 ```
 [kernel.dll地址 + 0x3c]             -> 指向PE头
 [kernel.dll地址 + 指向PE头 + 0x78]   -> PE导出表地址
 kernel.dll地址 + PE导出表地址        -> PE导出表内存虚拟地址
-[PE导出表内存虚拟地址 + 0x20]         -> 导出函数名称表地址
-kernel.dll地址 + 导出函数名称表地址   -> 导出函数名称表内存虚拟地址
+[PE导出表内存虚拟地址 + 0x20]         -> 函数名称表地址
+kernel.dll地址 + 导出函数名称表地址   -> 函数名称表内存虚拟地址
 ```
 代码如下：
 ```
@@ -52,5 +54,5 @@ add ecx, ebp
 mov ebx, [ecx + 0x20]
 add ebx, ebp
 ```
-最后ebx为kernel.dll函数名称表内存虚拟地址
+最后ebx中存放kernel.dll函数名称表内存虚拟地址
 
