@@ -93,9 +93,9 @@ for(int32_t i = 0; ; i ++){           // i为当前函数表中第几个函数
 }
 
 pop edi				// pushad中最后一个压入的是edi 正好是开始预留 用于存放的三个函数地址 的栈空间
-push 0x00003233                 // 压入字符'32'
-push 0x72657375                 // 压入字符 'user'
-push esp                        // 压入user32字符串地址
+push 0x00003233                 
+push 0x72657375                 
+push esp                        // "user32"
 stosd				// 把找到函数地址出入 edi对应的栈空间
 push edi    			// 继续压栈 平衡栈
 popad				// 还原环境
@@ -148,7 +148,7 @@ void main() {
 		mov ecx, [ebx + 0x0c]			// PEB+0x0c 是PEB_LDR_DATA结构体指针 存放这已经被进程加载的动态链接库的信息
 		mov ecx, [ecx + 0x1c]			// PEB_LDR_DATA+0x1c 指向模块初始化链表的头指针 InInitalizationOrderModuleList
 		mov ecx, [ecx]				// 进入链表第一个就是ntdll.dll
-		mov ebp, [ecx + 0x08]			// ebp 即kernel32.dll基地址
+		mov ebp, [ecx + 0x08]			// ebp: kernel32.dll基地址
 
 		// 与 hash 的查找相关
 		find_lib_funcs :
