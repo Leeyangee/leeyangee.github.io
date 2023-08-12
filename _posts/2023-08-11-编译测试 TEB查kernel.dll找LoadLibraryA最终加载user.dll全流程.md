@@ -150,16 +150,16 @@ void main() {
 
 		// 与 hash 的查找相关
 		find_lib_funcs :
-		      lodsd					      // 将[esi]中的4字节 传到eax中
-		      cmp eax, 0x1e380a6a 			// 比较 MessageBoxA 字符串的hash值
-		      jne find_funcs                      // 如果不相等则继续查找
-		      xchg eax, ebp				// 记录当前hash值
-      		call[edi - 0x8]
-      		xchg eax, ebp				// 还原当前hash值 并且把exa基地址更新为 user32.dll的基地址
+		      	lodsd					      // 将[esi]中的4字节 传到eax中
+		      	cmp eax, 0x1e380a6a 			// 比较 MessageBoxA 字符串的hash值
+		      	jne find_funcs                      // 如果不相等则继续查找
+		      	xchg eax, ebp				// 记录当前hash值
+      			call[edi - 0x8]
+      			xchg eax, ebp				// 还原当前hash值 并且把exa基地址更新为 user32.dll的基地址
 
 		// 在PE文件中查找相应的API函数
 		find_funcs :
-		      pushad					// 保存寄存器环境
+		      	pushad					// 保存寄存器环境
 			mov eax, [ebp + 0x3c]			// PE头
 			mov ecx, [ebp + eax + 0x78]		// 得到导出表的指针
 			add ecx, ebp				// 得到导出函数表内存虚拟地址(VA)
@@ -168,15 +168,15 @@ void main() {
 			xor edi, edi				// 清空计数器
 
 			// 循环读取导出表函数
-            next_func_loop :
-                  inc edi					// 函数计数器+1
-                  mov esi, [ebx + edi * 4]		// 得到 当前函数名的地址(RVA)
-                  add esi, ebp				// 得到 当前函数名的内存虚拟地址(VA)
-                  cdq;
+            	next_func_loop :
+                  	inc edi					// 函数计数器+1
+                  	mov esi, [ebx + edi * 4]		// 得到 当前函数名的地址(RVA)
+                  	add esi, ebp				// 得到 当前函数名的内存虚拟地址(VA)
+                  	cdq;
 
 		// 计算hash值
-	      hash_loop:					      
-		      movsx eax, byte ptr[esi]		// 得到当前函数名称 第esi的一个字母
+	      	hash_loop:					      
+		      	movsx eax, byte ptr[esi]		// 得到当前函数名称 第esi的一个字母
 			cmp al, ah				        // 比较到达函数名最后的0没有
 			jz compare_hash				  // 函数名hash 计算完毕后跳到 下一个流程
 			ror edx, 7				        // 循环右移7位
@@ -185,8 +185,8 @@ void main() {
 			jmp hash_loop				  
 
 			// hash值的比较
-            compare_hash :
-		      cmp edx, [esp + 0x1c]			// 比较 目标函数名hash 和 当前函数名的hash
+            	compare_hash :
+		      	cmp edx, [esp + 0x1c]			// 比较 目标函数名hash 和 当前函数名的hash
 			jnz next_func_loop			// 如果 不等于 继续下一个函数名
 			mov ebx, [ecx + 0x24]			// 得到 函数序号列表的 相对位置
 			add ebx, ebp				// 得到 函数序号列表的 绝对位置
@@ -206,8 +206,8 @@ void main() {
 			jne find_lib_funcs
 
 			// 下方的代码，就是弹窗
-            func_call :
-		      xor ebx, ebx		// 将 ebx 清0
+            	func_call :
+		      	xor ebx, ebx		// 将 ebx 清0
 			push ebx
 			push 0x20202067
 			push 0x75625f61
