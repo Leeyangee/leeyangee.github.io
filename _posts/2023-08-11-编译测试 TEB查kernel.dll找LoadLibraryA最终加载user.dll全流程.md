@@ -105,7 +105,7 @@ popad		// 还原环境
 ```
 call[edi - 0x8]
 ```
-eax成功返回user32.dll地址
+调用结束后eax中存放user32.dll地址
 
 # [](#header-1)0x03、调用user.dll MessageBox全流程
 
@@ -127,8 +127,8 @@ void main() {
 		CLD                             // 清空标志位DF
 		push 0x1e380a6a		        // 压入 MessageBoxA 字符串的hash
 		push 0x4fd18963	    	        // 压入 ExitProcess 字符串的hash
-		push 0x0c917432 			  // 压入 LoadLibraryA 字符串的hash
-		mov esi, esp	       	  // 指向栈中存放LoadLibraryA的 hash 地址
+		push 0x0c917432 		// 压入 LoadLibraryA 字符串的hash
+		mov esi, esp	       	  	// 指向栈中存放LoadLibraryA的 hash 地址
 		lea edi, [esi - 0xc]	        // 用于存放后边找到的 三个函数地址
 
 		// 开辟0x400大小的栈空间
@@ -152,12 +152,12 @@ void main() {
 
 		// 与 hash 的查找相关
 		find_lib_funcs :
-		      	lodsd					      // 将[esi]中的4字节 传到eax中
-		      	cmp eax, 0x1e380a6a 			// 比较 MessageBoxA 字符串的hash值
-		      	jne find_funcs                      // 如果不相等则继续查找
-		      	xchg eax, ebp				// 记录当前hash值
+		      	lodsd				// [esi]4字节传到eax中
+		      	cmp eax, 0x1e380a6a 		// 0x1e380a6a: MessageBoxA的hash值
+		      	jne find_funcs                  // 如果不相等则继续查找
+		      	xchg eax, ebp			// 记录当前hash值
       			call[edi - 0x8]
-      			xchg eax, ebp				// 还原当前hash值 并且把exa基地址更新为 user32.dll的基地址
+      			xchg eax, ebp			// 还原当前hash值 并且把exa基地址更新为 user32.dll的基地址
 
 		// 在PE文件中查找相应的API函数
 		find_funcs :
@@ -169,7 +169,7 @@ void main() {
 			add ebx, ebp				// 得到导出函数名称表内存虚拟地址(VA)
 			xor edi, edi				// 清空计数器
 
-			// 循环读取导出表函数
+		// 循环读取函数名称表
             	next_func_loop :
                   	inc edi					// 函数计数器+1
                   	mov esi, [ebx + edi * 4]		// 得到 当前函数名的地址(RVA)
@@ -179,11 +179,11 @@ void main() {
 		// 计算hash值
 	      	hash_loop:					      
 		      	movsx eax, byte ptr[esi]		// 得到当前函数名称 第esi的一个字母
-			cmp al, ah				        // 比较到达函数名最后的0没有
-			jz compare_hash				  // 函数名hash 计算完毕后跳到 下一个流程
-			ror edx, 7				        // 循环右移7位
-			add edx, eax				  // 累加得到hash
-			inc esi					  // 计数+1 得到函数名的下一个字母
+			cmp al, ah				// 比较到达函数名最后的0没有
+			jz compare_hash				// 函数名hash 计算完毕后跳到 下一个流程
+			ror edx, 7				// 循环右移7位
+			add edx, eax				// 累加得到hash
+			inc esi					// 计数+1 得到函数名的下一个字母
 			jmp hash_loop				  
 
 			// hash值的比较
@@ -196,41 +196,41 @@ void main() {
 			mov ebx, [ecx + 0x1c]			// 得到 函数地址列表的 相对位置
 			add ebx, ebp				// 得到 函数地址列表的 绝对位置
 			add ebp, [ebx + 4 * edi]		// 得到 当前函数的绝对地址 
-										// 循环依次得到kernel32.dll中的 LoadLibraryA  ExitProcess
-										// 和user32.dll中的 MessageBoxA
+								// 循环依次得到kernel32.dll中的 LoadLibraryA  ExitProcess
+								// 和user32.dll中的 MessageBoxA
 
-			xchg eax, ebp				    // 把函数地址放入eax中
-			pop edi					        // pushad中最后一个压入的是edi 正好是开始预留 用于存放的三个函数地址 的栈空间
-			stosd					        // 把找到函数地址出入 edi对应的栈空间
-			push edi				        // 继续压栈 平衡栈
-			popad					        // 还原环境
+			xchg eax, ebp				// 把函数地址放入eax中
+			pop edi					// pushad中最后一个压入的是edi 正好是开始预留 用于存放的三个函数地址 的栈空间
+			stosd					// 把找到函数地址出入 edi对应的栈空间
+			push edi				// 平衡栈
+			popad					// 还原环境
 			cmp eax, 0x1e380a6a			    
 			jne find_lib_funcs
 
-			// 下方的代码，就是弹窗
+		// 下方的代码，就是弹窗
             	func_call :
 		      	xor ebx, ebx		// 将 ebx 清0
 			push ebx
 			push 0x20202067
 			push 0x75625f61
 			push 0x7965656c
-			mov eax, esp	
+			mov eax, esp		// "leeya_bug"
 			push ebx
-			push 0x2020206b
+			push 0x2020206b		
 			push 0x6f207473
 			push 0x65742067
 			push 0x75625f61	
 			push 0x7965656c 
-			mov ecx, esp	
+			mov ecx, esp		// "leeya_bug test ok"
 
 			push ebx		// messageBox 第四个参数
 			push eax		// messageBox 第三个参数
 			push ecx		// messageBox 第二个参数
 			push ebx		// messageBox 第一个参数
 
-			call[edi - 0x04]			    // 调用	MessageBoxA
+			call[edi - 0x04]	// 调用	MessageBoxA
 			push ebx
-			call[edi - 0x08]			    // 调用 ExitProcess
+			call[edi - 0x08]	// 调用 ExitProcess
 			nop
 			nop
 			nop
