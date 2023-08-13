@@ -111,6 +111,10 @@ call[edi - 0x8]
 
 调用user.dll MessageBox全流程代码，以下使用内联汇编程序演示: 
 ```
+#pragma comment(linker,"/SECTION:.data,RWE")
+#include <iostream>
+#include <windows.h>
+
 void main() {
 	__asm {
 		nop
