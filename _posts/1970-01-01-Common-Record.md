@@ -1,5 +1,5 @@
 ---
-title: CVE-Record
+title: Common-Record
 published: true
 ---
 
