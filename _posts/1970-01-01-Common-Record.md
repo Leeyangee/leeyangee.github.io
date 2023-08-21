@@ -3,8 +3,18 @@ title: CVE-Record
 published: true
 ---
 
-在此记录所有discovered by leeya_bug(leeyange、Leeyange)的CVE漏洞数据  
-在此公开的数据一定满足以下条件：CVE允许公开、厂商有计划更新版本补丁  
+在此记录discovered by leeya_bug(leeyange、Leeyange)的通用漏洞数据  
+在此公开的数据一定满足以下条件：该漏洞允许被公开披露、厂商有计划更新版本补丁  
+
+<details>
+      <summary><font color="#b5e853">Private</font>: abupy <= 0.4.0, SQL Injection</summary>
+      <pre><code>
+<a>Private</a>
+仓库地址: <a id="cve_rep">https://github.com/bbfamily/abu</a>
+官方网站：<a id="cve_rep">http://www.abuquant.com</a>
+官方微信：<a>abu_quant</a>
+      </code></pre>
+</details><p></p>
 
 <details>
       <summary><font color="#b5e853">CVE-2023-38941</font>: django-sspanel v2022.2.2, RCE</summary>
