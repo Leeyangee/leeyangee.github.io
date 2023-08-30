@@ -7,7 +7,7 @@ published: true
 在此公开的数据一定满足以下条件：该漏洞允许被公开披露、厂商有计划更新版本补丁  
 
 <details>
-      <summary><font color="#b5e853">Private</font>: abupy <= 0.4.0, SQL Injection</summary>
+      <summary><font color="#b5e853">Private</font>: abu/abupy <= 0.4.0, SQL Injection</summary>
       <pre><code>
 <a>Private</a>
 仓库地址: <a id="rep">https://github.com/bbfamily/abu</a>
