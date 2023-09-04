@@ -9,7 +9,7 @@ published: true
 <details>
       <summary><font color="#b5e853">CVE-2023-39654</font>: abu/abupy <= 0.4.0, SQL Injection</summary>
       <pre><code>
-<a>Private</a>
+<a id="cve_addr">CVE-2023-39654</a>
 仓库地址: <a id="rep">https://github.com/bbfamily/abu</a>
 官方网站：<a id="rep">http://www.abuquant.com</a>
 官方微信：<a>abu_quant</a>
@@ -56,7 +56,7 @@ published: true
 <details>
       <summary><font color="#b5e853">Private</font>: Dango-Translator v4.5.5, Config Command Execute</summary>
       <pre><code>
-<a id="cve_addr">CVE-2023-38942</a>
+<a>Private</a>
 仓库地址: <a id="rep">https://github.com/PantsuDango/Dango-Translator</a>
 官网地址: <a id="rep">https://translator.dango.cloud/</a>
 官方文档：<a id="rep">https://dango-docs.ap-sh.starivercs.cn</a>
@@ -93,7 +93,7 @@ published: true
 <details>
       <summary><font color="#b5e853">Private</font>:  web_chat, Stored XSS, php</summary>
       <pre><code>
-<a id="cve_addr">CVE-2023-37651</a>
+<a>Private</a>
 仓库地址: <a id="rep">https://github.com/jacky-zeng/web_chat</a>
       </code></pre>
 </details><p></p>
