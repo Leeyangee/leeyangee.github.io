@@ -7,7 +7,7 @@ published: true
 在此公开的数据一定满足以下条件：该漏洞允许被公开披露、厂商有计划更新版本补丁  
 
 <details>
-      <summary><font color="#b5e853">Private</font>: abu/abupy <= 0.4.0, SQL Injection</summary>
+      <summary><font color="#b5e853">CVE-2023-39654</font>: abu/abupy <= 0.4.0, SQL Injection</summary>
       <pre><code>
 <a>Private</a>
 仓库地址: <a id="rep">https://github.com/bbfamily/abu</a>
@@ -54,7 +54,7 @@ published: true
 </details><p></p>
 
 <details>
-      <summary><font color="#b5e853">CVE-2023-38942</font>: Dango-Translator v4.5.5, Config Command Execute</summary>
+      <summary><font color="#b5e853">Private</font>: Dango-Translator v4.5.5, Config Command Execute</summary>
       <pre><code>
 <a id="cve_addr">CVE-2023-38942</a>
 仓库地址: <a id="rep">https://github.com/PantsuDango/Dango-Translator</a>
@@ -91,7 +91,7 @@ published: true
 </details><p></p>
 
 <details>
-      <summary><font color="#b5e853">CVE-2023-37651</font>:  web_chat, Stored XSS, php</summary>
+      <summary><font color="#b5e853">Private</font>:  web_chat, Stored XSS, php</summary>
       <pre><code>
 <a id="cve_addr">CVE-2023-37651</a>
 仓库地址: <a id="rep">https://github.com/jacky-zeng/web_chat</a>
