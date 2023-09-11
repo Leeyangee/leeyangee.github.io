@@ -25,7 +25,7 @@ xalpha.fundinfo("../gaoduan/PinzhongRightApi.aspx?fc=AF5097&callback=jQuery18303
 ```
 就可以看到代码:'echo 成功触发'成功被执行
 
-# [](#header-1)0x01、审计过程
+# [](#header-1)0x01、构造过程
 
 首先，明确方向. 先放fortify里面扫一遍，整个项目中只发现了一个超高危险函数eval()，那么我们先从这里下手看看有没有利用点
 
@@ -88,7 +88,7 @@ http://fund.eastmoney.com/pingzhongdata/../gaoduan/PinzhongRightApi.aspx?fc=AF50
 ```
 最后，正则成功捕获到该数据并正确处理，最后成功eval
 
-
+# [](#header-1)0x02、结果
 
 [https://github.com/refraction-ray/xalpha/issues/175](https://github.com/refraction-ray/xalpha/issues/175)  
 与仓库管理者的更多对话，包括对问题的解决方案的建议都写在issue里，比较完整  
