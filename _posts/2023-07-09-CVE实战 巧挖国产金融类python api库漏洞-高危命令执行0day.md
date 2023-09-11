@@ -30,7 +30,7 @@ xalpha.fundinfo("../gaoduan/PinzhongRightApi.aspx?fc=AF5097&callback=jQuery18303
 首先，明确方向. 先放fortify里面扫一遍，整个项目中只发现了一个超高危险函数eval()，那么我们先从这里下手看看有没有利用点
 
 eval()所在的核心部分：
-```
+```python
     def _basic_init(self):
         if self.code.startswith("96"):
             self._hkfund_init()  # 中港互认基金处理
@@ -51,19 +51,19 @@ eval()所在的核心部分：
 经过观测发现，static class xalpha.fundinfo.__init__可以作为切入点改变static class xalpha.fundinfo._basic_init中调用的类变量，最终调用eval
 
 在__init__中，发现了可能的调用路径使__init__(payload) 转换为 _basic_init 中将会调用的 self._url  
-payload变量变化链如下所示：
-```
+payload -> self._url 变量变化链如下所示：
+```python
 payload
 ↓
 payload = payload.zfill(6)
 ↓
-"http://fund.eastmoney.com/pingzhongdata/" + payload + ".js"
+self._url = "http://fund.eastmoney.com/pingzhongdata/" + payload + ".js"
 ```
 最终self._url = "http://fund.eastmoney.com/pingzhongdata/" + payload.zfill(6) + ".js"  
 
 然后，在某个不远的堆栈中，将会调用 _basic_init(self)，在 _basic_init 中发现了可能的调用路径使变量 self._url 转换为 eval 的实参 l
-self._url变量变化链如下所示：
-```
+self._url -> l 变量变化链如下所示：
+```python
 self._page = rget(self._url)
 ↓
 l = re.match(
@@ -71,8 +71,6 @@ l = re.match(
 ).groups()[0]
 ↓
 l = l.replace("null", "None")
-↓
-l = eval(l)
 ```
 最终l = (re.match(
     r"[\s\S]*Data_netWorthTrend = ([^;]*);[\s\S]*", rget("http://fund.eastmoney.com/pingzhongdata/" + payload.zfill(6) + ".js").text
@@ -80,8 +78,8 @@ l = eval(l)
 
 那么现在就有一个非常棘手的问题摆在眼前：如何让payload变量经过该网站请求后依然得到我们想要的结果？
 
-我起初认为这个问题很好解决，直接在该网站的搜索栏、错误界面中搜索看看返回的数据是否可控，发现失败了. 该网站正常业务请求任何信息，所返回的数据中不携带任何原先信息  
-再想构造一个xss，想让网站返回我们想要的结果，也失败了
+我起初认为这个问题很好解决，直接在该网站的搜索栏、错误界面中搜索看看返回的数据是否可控，发现失败了. 该网站正常业务请求任何信息，所返回的数据中均不携带任何原先信息(我猜想网站建设者在建设时也考虑到了这一点)  
+再想构造一个xss，想让网站返回想要的结果，也失败了
 
 经过半天的找寻，终于发现一个回调函数接口有问题，请求错误回调函数名称时，响应中正好会包含该错误的函数名称. 正好能满足我们的需求:发送错误数据，并让该网站返回我们想要的结果，即返回数据可控  
 回调函数接口如下
@@ -90,7 +88,7 @@ http://fund.eastmoney.com/pingzhongdata/../gaoduan/PinzhongRightApi.aspx?fc=AF50
 ```
 最后，正则成功捕获到该数据并正确处理，最后成功eval
 
-构造payload = ../gaoduan/PinzhongRightApi.aspx?fc=AF5097&callback=jQuery183037745026472073073_ Data_netWorthTrend = __import__('os').system('echo 成功触发'); &_=1688890155531#
+
 
 [https://github.com/refraction-ray/xalpha/issues/175](https://github.com/refraction-ray/xalpha/issues/175)  
 与仓库管理者的更多对话，包括对问题的解决方案的建议都写在issue里，比较完整  
