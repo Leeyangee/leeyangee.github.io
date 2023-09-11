@@ -61,7 +61,7 @@ self._url = "http://fund.eastmoney.com/pingzhongdata/" + payload + ".js"
 ```
 最终self._url = "http://fund.eastmoney.com/pingzhongdata/" + payload.zfill(6) + ".js"  
 
-然后，在某个不远的堆栈中，将会调用 _basic_init(self)，在 _basic_init 中发现了可能的调用路径使变量 self._url 转换为 eval 的实参 l
+然后，在某个不远的堆栈中，将会调用 _basic_init(self)，在 _basic_init 中发现了可能的调用路径使变量 self._url 转换为 eval 的实参 l  
 self._url -> l 变量变化链如下所示：
 ```python
 self._page = rget(self._url)
