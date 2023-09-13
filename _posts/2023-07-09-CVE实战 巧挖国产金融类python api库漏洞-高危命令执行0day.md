@@ -83,7 +83,7 @@ class fundinfo(basicinfo):
 
 # [](#header-1)0x02、开始构造
 
-在__init__中，发现了可能的调用路径使__init__(payload) 转换为 _basic_init 中将会调用的 self._url  
+在__init__中，发现了可能的调用路径使__init__(payload) 的实参 payload 转换为 _basic_init 中将会调用的 self._url  
 payload -> self._url 变量变化链如下所示：
 ```python
 payload
