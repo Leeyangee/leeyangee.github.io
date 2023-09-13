@@ -29,7 +29,7 @@ xalpha.fundinfo("../gaoduan/PinzhongRightApi.aspx?fc=AF5097&callback=jQuery18303
 
 首先，明确方向. 先放fortify里面扫一遍，整个项目中只发现了一个超高危险函数eval()，那么我们先从这里下手看看有没有利用点
 
-eval()所在的核心部分：
+_basic_init 中 eval()所在的核心部分：
 ```python
     def _basic_init(self):
         if self.code.startswith("96"):
@@ -48,7 +48,37 @@ eval()所在的核心部分：
         l = eval(l)
 ```
 
-经过观测发现，static class xalpha.fundinfo.__init__可以作为切入点改变static class xalpha.fundinfo._basic_init中调用的类变量，最终调用eval
+经过观测发现，static func xalpha.fundinfo.__init__ 可以作为切入点改变 static func xalpha.fundinfo._basic_init 中调用的类变量 static variable self._url ，最终调用 eval
+__init__ 中 self._url 所在的核心部分
+```python
+def __init__(
+        self,
+        code,
+        round_label=0,
+        dividend_label=0,
+        fetch=False,
+        save=False,
+        path="",
+        form="csv",
+        priceonly=False,
+    ):
+        if round_label == 1 or (code in droplist):
+            label = 1  # the scheme of round down on share purchase
+        else:
+            label = 0
+        if code.startswith("F") and code[1:].isdigit():
+            code = code[1:]
+        elif code.startswith("M") and code[1:].isdigit():
+            raise FundTypeError(
+                "This code seems to be a mfund, use ``mfundinfo`` instead"
+            )
+        code = code.zfill(6)  # 1234 is the same as 001234
+        assert code.isdigit(), "fund code must be a strin of six digits"
+        assert len(code) == 6, "fund code must be a strin of six digits"
+        self._url = (
+            "http://fund.eastmoney.com/pingzhongdata/" + code + ".js"
+        )  # js url api for info of certain fund
+```
 
 在__init__中，发现了可能的调用路径使__init__(payload) 转换为 _basic_init 中将会调用的 self._url  
 payload -> self._url 变量变化链如下所示：
