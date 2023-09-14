@@ -12,7 +12,8 @@ published: true
 <a id="cve_addr">CVE-2023-39654</a>
 仓库地址: <a id="rep">https://github.com/bbfamily/abu</a>
 官方网站：<a id="rep">http://www.abuquant.com</a>
-官方微信：<a>abu_quant</a>
+官方微信公众号：<a>abu_quant</a>
+官方文档：<a id="rep">https://github.com/bbfamily/abu/tree/master/abupy_lecture</a>
       </code></pre>
 </details><p></p>
 
