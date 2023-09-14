@@ -46,6 +46,9 @@ class fundinfo(basicinfo):
         ).groups()[0]
         l = l.replace("null", "None")  # 暂未发现基金净值有 null 的基金，若有，其他地方也很可能出问题！
         l = eval(l)
+
+        ...(eval执行，忽略下半部分)
+        
 ```
 
 经过观测发现，static func xalpha.fundinfo.__init__ 可以作为切入点改变 static func xalpha.fundinfo._basic_init 中调用的类变量 static variable self._url ，最终调用 eval  
@@ -79,6 +82,9 @@ class fundinfo(basicinfo):
             self._url = (
                 "http://fund.eastmoney.com/pingzhongdata/" + code + ".js"
             )  # js url api for info of certain fund
+
+            ......(不影响堆栈运行，忽略下半部分)
+
 ```
 
 # [](#header-1)0x02、开始构造
