@@ -47,7 +47,7 @@ class fundinfo(basicinfo):
         l = l.replace("null", "None")  # 暂未发现基金净值有 null 的基金，若有，其他地方也很可能出问题！
         l = eval(l)
 
-        ...(eval执行，忽略下半部分)
+        ...(eval执行, 忽略下半部分)
         
 ```
 
@@ -83,7 +83,7 @@ class fundinfo(basicinfo):
                 "http://fund.eastmoney.com/pingzhongdata/" + code + ".js"
             )  # js url api for info of certain fund
 
-            ......(不影响堆栈运行，忽略下半部分)
+            ......(不影响堆栈运行, 忽略下半部分)
 
 ```
 
