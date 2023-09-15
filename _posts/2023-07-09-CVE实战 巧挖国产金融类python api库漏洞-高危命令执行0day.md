@@ -136,6 +136,5 @@ http://fund.eastmoney.com/pingzhongdata/../gaoduan/PinzhongRightApi.aspx?fc=AF50
 [https://github.com/refraction-ray/xalpha/issues/175](https://github.com/refraction-ray/xalpha/issues/175)  
 与仓库管理者的更多对话，包括对问题的解决方案的建议都写在issue里，比较完整  
 
-比较有趣的是，repository负责人以为只是一个普通的local command execute，后来仔细想才发现不对劲。经过和负责人探讨后才发现这个漏洞疑似是用户交pull request时负责人没有仔细检查用户代码才造成的
 
 
