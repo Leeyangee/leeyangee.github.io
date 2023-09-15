@@ -135,7 +135,7 @@ http://fund.eastmoney.com/pingzhongdata/gaoduan/PinzhongRightApi.aspx?fc=AF5097&
 ../gaoduan/PinzhongRightApi.aspx?fc=AF5097&callback=jQuery183037745026472073073_ Data_netWorthTrend = __import__('os').system('echo 成功触发'); &_=1688890155531#
 ```
 
-最后，正则成功捕获到该数据并正确处理，最后成功eval
+最后，正则成功捕获到该数据并正确处理，成功eval
 
 # [](#header-1)0x03、结果
 
