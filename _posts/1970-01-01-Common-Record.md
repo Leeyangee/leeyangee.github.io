@@ -36,9 +36,8 @@ published: true
 </details><p></p>
 
 <details>
-      <summary><font color="#b5e853">CVE-2023-37659</font>: xalpha v0.11.4 ~ v0.11.8, RCE, python</summary>
+      <summary><font color="#b5e853">CNNVD-202307-770</font>: xalpha v0.11.4 ~ v0.11.8, RCE, python</summary>
       <pre><code>
-<a id="cve_addr">CVE-2023-37659</a>
 仓库地址: <a id="rep">https://github.com/refraction-ray/xalpha</a>
 仓库历史: <a id="rep">https://re-ra.xyz/xalpha-诞生记</a>
 官方文档: <a id="rep">https://xalpha.readthedocs.io</a>
