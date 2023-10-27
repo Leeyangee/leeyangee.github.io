@@ -1,5 +1,5 @@
 ---
-title: CVE实战 巧挖国产金融类python api库漏洞-高危命令执行0day
+title: 通用实战 巧挖国产金融类python api库漏洞-高危命令执行0day
 published: true
 ---
 # [](#header-1)0x00、前言  
