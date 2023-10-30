@@ -1,5 +1,5 @@
 ---
-title: 通用实战 挖掘国产金融类python api库漏洞-RCE 0day
+title: 通用实战 挖掘国产金融类python api库漏洞-高危害RCE 0day
 published: true
 ---
 # [](#header-1)0x00、前言  
