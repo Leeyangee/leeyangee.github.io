@@ -4,12 +4,12 @@ published: true
 ---
 
 在此记录discovered by leeya_bug(leeyange、Leeyange)的通用漏洞数据  
-在此公开的数据一定满足以下条件：该漏洞允许被公开披露、厂商有计划更新版本补丁  
+在此公开的数据一定满足以下条件：厂商有计划更新版本补丁  
 
 <details>
       <summary><font color="#b5e853">CNVD-YCGW-202310******</font>:  , Sensi Info Leak, PHP</summary>
       <pre><code>
-            细节暂不公开
+            根据相关法律法规，细节暂不公开
       </code></pre>
 </details><p></p>
 
@@ -27,7 +27,7 @@ published: true
 <details>
       <summary><font color="#b5e853">CNVD-2023-*****</font>: , Sensi Info Leak, Java</summary>
       <pre><code>
-            细节暂不公开
+            根据相关法律法规，细节暂不公开
       </code></pre>
 </details><p></p>
 
