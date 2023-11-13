@@ -7,6 +7,13 @@ published: true
 在此公开的数据一定满足以下条件：该漏洞允许被公开披露、厂商有计划更新版本补丁  
 
 <details>
+      <summary><font color="#b5e853">CNVD-YCGW-202310******</font>:  , Sensi Info Leak, PHP</summary>
+      <pre><code>
+            细节暂不公开
+      </code></pre>
+</details><p></p>
+
+<details>
       <summary><font color="#b5e853">CVE-2023-39654</font>: abu/abupy <= 0.4.0, SQL Injection</summary>
       <pre><code>
 <a id="cve_addr">CVE-2023-39654</a>
@@ -16,6 +23,14 @@ published: true
 官方文档：<a id="rep">https://github.com/bbfamily/abu/tree/master/abupy_lecture</a>
       </code></pre>
 </details><p></p>
+
+<details>
+      <summary><font color="#b5e853">CNVD-2023-*****</font>: , Sensi Info Leak, Java</summary>
+      <pre><code>
+            细节暂不公开
+      </code></pre>
+</details><p></p>
+
 
 <details>
       <summary><font color="#b5e853">CVE-2023-38941</font>: django-sspanel v2022.2.2, RCE</summary>
