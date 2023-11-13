@@ -9,7 +9,7 @@ published: true
 <details>
       <summary><font color="#b5e853">CNVD-YCGW-202310******</font>:  , Sensi Info Leak, PHP</summary>
       <pre><code>
-            根据相关法律法规，细节暂不公开
+根据相关法律法规，漏洞细节暂不公开
       </code></pre>
 </details><p></p>
 
@@ -27,7 +27,7 @@ published: true
 <details>
       <summary><font color="#b5e853">CNVD-2023-*****</font>: , Sensi Info Leak, Java</summary>
       <pre><code>
-            根据相关法律法规，细节暂不公开
+根据相关法律法规，漏洞细节暂不公开
       </code></pre>
 </details><p></p>
 
