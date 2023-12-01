@@ -14,6 +14,6 @@ title: 关于
 
 本网站的所有文章遵循CC协议
 
-leeya_bug CC   
+leeya_bug(leeyange) CC   
 
 
