@@ -2,10 +2,37 @@
   <div style="margin-top:30vh;margin-bottom:10vh">
     <h1 id="showtag">Hello,World!</h1>
     <script>
-      function test() {
-          console.log(8 * 9);
-      }
-      test();
+            async function rollingWords(){
+                var TIME = 40;
+                var listMax = 0;
+                        
+                var showed = "&nbsp;";
+                showAdd = "Hello,World!";
+                for(var i = 0;i <= showAdd.length; i ++){
+                    document.getElementById(0).innerHTML = showed;
+                    showed = showed + showAdd[i];
+                    await sleep(TIME);
+                }
+                await sleep(500);
+                getRequest();
+            }
+            
+            function getRequest(){
+                rollingWords();
+            }
+            
+            function sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+            
+            
+            function check(){
+                try{
+                    getRequest();
+                }catch(error){ }
+            }
+            
+            check()
     </script>
     <a style="text-decoration: none;" href="{{ "/" | prepend: site.baseurl | replace: '//', '/' }}">
     {% assign owner_first_name = site.owner | split: " " %}
