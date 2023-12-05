@@ -16,8 +16,8 @@
                     await sleep(TIME);
                 }
                 await sleep(500);
-                for(var i = showAdd.length; i >= 0; i --){
-                    document.getElementById("showtag").innerHTML = showAdd.substr(1,i);
+                for(var i = showAdd.length; i >= 1; i --){
+                    document.getElementById("showtag").innerHTML = showAdd.substr(0,i);
                     await sleep(TIME);
                 }
                 document.getElementById("showtag").innerHTML = "&nbsp;";
