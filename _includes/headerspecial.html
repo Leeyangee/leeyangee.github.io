@@ -10,14 +10,15 @@
                 var TIME = 60;
                 var listMax = 0;
                         
-                var showed = "&nbsp;";
                 showAdd = "Hello,World!";
                 for(var i = 0;i <= showAdd.length; i ++){
-                    document.getElementById("showtag").innerHTML = showed;
-                    showed = showed + showAdd[i];
+                    document.getElementById("showtag").innerHTML = showAdd.substr(0,i);
                     await sleep(TIME);
                 }
-                document.getElementById("showtag").innerHTML = document.getElementById("showtag").innerHTML + "&nbsp;";
+                for(var i = showAdd.length; i >= 0; i --){
+                    document.getElementById("showtag").innerHTML = showAdd.substr(0,i);
+                    await sleep(TIME);
+                }
                 await sleep(500);
             }
             
