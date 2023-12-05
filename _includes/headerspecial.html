@@ -9,17 +9,19 @@
             async function rollingWords(){
                 var TIME = 60;
                 var listMax = 0;
-                        
+                
                 showAdd = "Hello,World!";
                 for(var i = 0;i <= showAdd.length; i ++){
                     document.getElementById("showtag").innerHTML = showAdd.substr(0,i);
                     await sleep(TIME);
                 }
+                await sleep(500);
                 for(var i = showAdd.length; i >= 0; i --){
-                    document.getElementById("showtag").innerHTML = showAdd.substr(0,i);
+                    document.getElementById("showtag").innerHTML = showAdd.substr(1,i);
                     await sleep(TIME);
                 }
-                await sleep(500);
+                document.getElementById("showtag").innerHTML = "&nbsp;";
+              
             }
             
             function getRequest(){
