@@ -7,7 +7,14 @@ published: true
 在此公开的数据一定满足以下条件：非在野漏洞、厂商已更新补丁  
 
 <details>
-      <summary><font color="#2bbc8a">CNVD-YCGW-202310******</font>:  , Sensi Info Leak, PHP</summary>
+      <summary><font color="#2bbc8a">CVE-2023-*****</font>: 百度公司 深度学习平台paddle官方库 <= 2.5.2, RCE</summary>
+      <pre><code>
+根据相关法律法规，漏洞细节暂不公开
+      </code></pre>
+</details><p></p>
+
+<details>
+      <summary><font color="#2bbc8a">CNVD-YCGW-202310******</font>:  , Sensi Info Leak</summary>
       <pre><code>
 根据相关法律法规，漏洞细节暂不公开
       </code></pre>
@@ -19,13 +26,19 @@ published: true
 <a id="cve_addr">CVE-2023-39654</a>
 仓库地址: <a id="rep">https://github.com/bbfamily/abu</a>
 官方网站：<a id="rep">http://www.abuquant.com</a>
-官方微信公众号：<a>abu_quant</a>
 官方文档：<a id="rep">https://github.com/bbfamily/abu/tree/master/abupy_lecture</a>
       </code></pre>
 </details><p></p>
 
 <details>
-      <summary><font color="#2bbc8a">CNVD-2023-*****</font>: , Sensi Info Leak, Java</summary>
+      <summary><font color="#2bbc8a">CNVD-2023-97730</font>: 正方软件股份公司 智慧校园系统, Sensi Info Leak, Java</summary>
+      <pre><code>
+请关注厂商修复信息：<a id="rep">http://www.zfsoft.com</a>
+      </code></pre>
+</details><p></p>
+
+<details>
+      <summary><font color="#2bbc8a">CNVD-2023-91577</font>: , Sensi Info Leak, PHP</summary>
       <pre><code>
 根据相关法律法规，漏洞细节暂不公开
       </code></pre>
