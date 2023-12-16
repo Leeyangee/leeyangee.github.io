@@ -38,7 +38,7 @@ published: true
 </details><p></p>
 
 <details>
-      <summary><font color="#2bbc8a">CNVD-2023-97730</font>: 正方软件股份公司 智慧校园系统, Sensi Info Leak, Java</summary>
+      <summary><font color="#2bbc8a">CNVD-2023-97730</font>: 正方软件公司 智慧校园系统, Sensi Info Leak, Java</summary>
       <pre><code>
 请关注厂商修复信息：<a id="rep">http://www.zfsoft.com</a>
       </code></pre>
