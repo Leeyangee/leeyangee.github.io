@@ -31,19 +31,18 @@ published: true
 </details><p></p>
 
 <details>
-      <summary><font color="#2bbc8a">CNVD-2023-97730</font>: 正方软件股份公司 智慧校园系统, Sensi Info Leak, Java</summary>
-      <pre><code>
-请关注厂商修复信息：<a id="rep">http://www.zfsoft.com</a>
-      </code></pre>
-</details><p></p>
-
-<details>
-      <summary><font color="#2bbc8a">CNVD-2023-91577</font>: , Sensi Info Leak, PHP</summary>
+      <summary><font color="#2bbc8a">CNVD-2023-91577</font>: 某企业 某广播系统, Sensi Info Leak, PHP</summary>
       <pre><code>
 根据相关法律法规，漏洞细节暂不公开
       </code></pre>
 </details><p></p>
 
+<details>
+      <summary><font color="#2bbc8a">CNVD-2023-97730</font>: 正方软件股份公司 智慧校园系统, Sensi Info Leak, Java</summary>
+      <pre><code>
+请关注厂商修复信息：<a id="rep">http://www.zfsoft.com</a>
+      </code></pre>
+</details><p></p>
 
 <details>
       <summary><font color="#2bbc8a">CVE-2023-38941</font>: django-sspanel v2022.2.2, RCE</summary>
@@ -56,7 +55,7 @@ published: true
 </details><p></p>
 
 <details>
-      <summary><font color="#2bbc8a">CVE-2023-38943</font>: ShuiZe_0x727 v1.0, Config Command Execute</summary>
+      <summary><font color="#2bbc8a">CVE-2023-38943</font>: ShuiZe_0x727 v1.0, Command Execute</summary>
       <pre><code>
 <a id="cve_addr">CVE-2023-38943</a>
 仓库地址: <a id="rep">https://github.com/0x727/ShuiZe_0x727</a>
@@ -82,7 +81,7 @@ published: true
 </details><p></p>
 
 <details>
-      <summary><font color="#2bbc8a">Private</font>: Dango-Translator v4.5.5, Config Command Execute</summary>
+      <summary><font color="#2bbc8a">Private</font>: 团子翻译器 <= v4.5.5, Config Command Execute</summary>
       <pre><code>
 <a>Private</a>
 仓库地址: <a id="rep">https://github.com/PantsuDango/Dango-Translator</a>
