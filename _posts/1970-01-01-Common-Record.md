@@ -10,7 +10,7 @@ published: true
 
 <br>
 <details>
-      <summary><font color="#2bbc8a">CVE-2023-*****</font>: 百度公司 深度学习平台paddle官方库 <= 2.5.2, RCE</summary>
+      <summary><font color="#2bbc8a">CVE-2023-*****</font>: 百度公司 paddle官方库 <= 2.5.2, RCE</summary>
       <pre><code>
 请关注厂商修复信息：<a id="rep">http://www.baidu.com</a>
       </code></pre>
