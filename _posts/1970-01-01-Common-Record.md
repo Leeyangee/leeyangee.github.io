@@ -33,7 +33,7 @@ published: true
 </details><p></p>
 
 <details>
-      <summary><font color="#2bbc8a">CNVD-2023-91577</font>: 某企业 某广播系统, Sensi Info Leak, PHP</summary>
+      <summary><font color="#2bbc8a">CNVD-2023-91577</font>: 某企业 UDP广播系统, Sensi Info Leak, PHP</summary>
       <pre><code>
 根据相关法律法规，漏洞细节暂不公开
       </code></pre>
