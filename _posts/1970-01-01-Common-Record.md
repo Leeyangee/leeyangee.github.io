@@ -17,7 +17,7 @@ published: true
 </details><p></p>
 
 <details>
-      <summary><font color="#2bbc8a">CNVD-YCGW-20231004****</font>:  , Sensi Info Leak</summary>
+      <summary><font color="#2bbc8a">CNVD-YCGW-20231004****</font>: 某系统, Sensi Info Leak</summary>
       <pre><code>
 根据相关法律法规，漏洞细节暂不公开
       </code></pre>
