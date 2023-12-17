@@ -22,12 +22,12 @@
                     for(var j = 0;j < words.length; j ++){
                         showAdd = words[j];
                         for(var i = 0;i <= showAdd.length; i ++){
-                            document.getElementById("showtag").innerHTML = showAdd.substr(0,i) + "&nbsp;";
+                            document.getElementById("showtag").innerHTML = showAdd.substr(0,i) + "_&nbsp;";
                             await sleep(TIME);
                         }
                         await sleep(2000);
                         for(var i = showAdd.length; i >= 0; i --){
-                            document.getElementById("showtag").innerHTML = showAdd.substr(0,i) + "&nbsp;";
+                            document.getElementById("showtag").innerHTML = showAdd.substr(0,i) + "_&nbsp;";
                             await sleep(TIME);
                         }
                     }
