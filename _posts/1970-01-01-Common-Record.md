@@ -10,9 +10,9 @@ published: true
 
 <br>
 <details>
-      <summary><font color="#2bbc8a">CVE-2023-*****</font>: 百度公司 paddle官方库 <= 2.5.2, RCE</summary>
+      <summary><font color="#2bbc8a">CVE-****-*****</font>: 百度公司 某系统, 某危害</summary>
       <pre><code>
-请关注厂商修复信息：<a id="rep">http://www.baidu.com</a>
+根据相关法律法规及负责任的披露原则，漏洞细节不公开
       </code></pre>
 </details><p></p>
 
