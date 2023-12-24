@@ -7,7 +7,7 @@ title: 关于
 
 本站点所有文章均过滤资产方敏感信息，攻击手段、审计思路、POC构造法均避开关键思路，在其他计算机复现后果自负  
 
-若发布的文章侵犯了资产方利益/知识产权，请联系邮箱：leeyang928320@gmail.com，本站点将在三天之内给予答复  
+若发布的文章侵犯了资产方利益/知识产权，请联系邮箱：<a href="mailto:leeyang928320@gmail.com">leeyang928320@gmail.com</a>，本站点将在三天之内给予答复  
 
 # [](#header-1)原创声明
 
@@ -18,4 +18,4 @@ leeya_bug(leeyange) CC
 
 # [](#header-1)联系
 
-邮箱：leeyang928320@gmail.com
+邮箱：<a href="mailto:leeyang928320@gmail.com">leeyang928320@gmail.com</a>
