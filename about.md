@@ -20,7 +20,7 @@ leeya_bug(leeyange) CC
 本站点所有代码由 https://github.com/tocttou/hacker-blog 该开源项目改进而来
 
 为优化访问速度，本站点接纳了多个不同地区的cdn、图床服务，具体供应商如下所示:  
-github - 网站服务
+github - 网站服务  
 cloudflare - cdn服务  
 路过图床 - 图床服务(中国大陆地区)  
 gitee pages - 图床服务(中国大陆地区)  
