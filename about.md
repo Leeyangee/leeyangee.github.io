@@ -17,7 +17,7 @@ leeya_bug(leeyange) CC
 
 ### [](#header-3)关于该网站
 
-本站点所有代码由 https://github.com/tocttou/hacker-blog 该开源项目改进而来
+本站点所有代码由 <a href="https://github.com/tocttou/hacker-blog">https://github.com/tocttou/hacker-blog</a> 该开源项目改进而来
 
 为优化访问速度，本站点接纳了多个不同地区的cdn、图床服务，具体供应商如下所示:  
 github - 网站服务  
