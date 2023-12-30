@@ -22,7 +22,13 @@ leeya_bug(leeyange) CC
 
 ### [](#header-3)关于该网站
 
-本站点所有代码由 <a href="https://github.com/tocttou/hacker-blog">https://github.com/tocttou/hacker-blog</a> 该开源项目改进而来
+本站点所有代码由 <a href="https://github.com/tocttou/hacker-blog">https://github.com/tocttou/hacker-blog</a> 该开源项目改进而来，该项目遵循CC0 1.0协议  
+访问该网站表示你完全接受以下协议:  
+<iframe src="https://creativecommons.org/licenses/by-nc/1.0/deed.zh-hans"  style="background-color:#ffffff;width:30vw;">
+  <p>您的浏览器不支持  iframe 标签。</p>
+</iframe>  
+<a href="https://creativecommons.org/licenses/by-nc/3.0/deed.zh-hans">CC0 1.0 协议 - 中文版</a>  
+
 
 为优化访问速度，本站点接纳了多个不同地区的cdn、图床服务，具体供应商如下所示:  
 github - 网站服务  
