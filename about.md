@@ -40,15 +40,3 @@ github pages - 图床服务
 
 邮箱：<a href="mailto:leeyang928320@gmail.com">leeyang928320@gmail.com</a>
 
-
-访问该网站表示你完全接受以下协议:  
-
-
-<iframe src="https://creativecommons.org/licenses/by-nc/1.0/deed.zh-hans"  style="background-color:#ffffff;width:30vw;">
-  <p>您的浏览器不支持  iframe 标签。</p>
-</iframe>  
-
-<iframe src="https://opensource.org/license/MIT/"  style="background-color:#ffffff;width:30vw;">
-  <p>您的浏览器不支持  iframe 标签。</p>
-</iframe>  
-
