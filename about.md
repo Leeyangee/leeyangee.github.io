@@ -13,6 +13,9 @@ title: 关于
 ### [](#header-3)关于文章
 
 本站点的所有文章均属完全自创，且所有文章均遵循CC 3.0协议，copy文章请指明出处  
+<iframe src="https://creativecommons.org/licenses/by-nc/3.0/deed.zh-hans">
+  <p>您的浏览器不支持  iframe 标签。</p>
+</iframe>
 <a href="https://creativecommons.org/licenses/by-nc/3.0/deed.zh-hans">CreativeCommon 3.0 协议 - 中文版</a>  
 leeya_bug(leeyange) CC  
 
