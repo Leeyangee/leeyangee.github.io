@@ -22,7 +22,7 @@ leeya_bug(leeyange) CC
 
 ### [](#header-3)关于该网站
 
-本站点所有代码由 <a href="https://github.com/tocttou/hacker-blog">https://github.com/tocttou/hacker-blog</a> 该开源项目改进而来，该项目遵循CC0 1.0协议  
+本站点所有代码均基于 <a href="https://github.com/tocttou/hacker-blog">https://github.com/tocttou/hacker-blog</a> 该开源项目，该项目遵循CC0 1.0协议  
 访问该网站表示你完全接受以下协议:  
 <iframe src="https://creativecommons.org/licenses/by-nc/1.0/deed.zh-hans"  style="background-color:#ffffff;width:30vw;">
   <p>您的浏览器不支持  iframe 标签。</p>
