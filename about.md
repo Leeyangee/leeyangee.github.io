@@ -13,22 +13,11 @@ title: 关于
 ### [](#header-3)关于文章
 
 本站点的所有文章均属完全自创，且所有文章均遵循CC 3.0协议，copy文章请指明出处  
-访问该网站表示你完全接受以下协议:  
-<iframe src="https://creativecommons.org/licenses/by-nc/3.0/deed.zh-hans"  style="background-color:#ffffff;width:30vw;">
-  <p>您的浏览器不支持  iframe 标签。</p>
-</iframe>  
-<a href="https://creativecommons.org/licenses/by-nc/3.0/deed.zh-hans">CreativeCommon 3.0 协议 - 中文版</a>  
-leeya_bug(leeyange) CC  
+leeya_bug(leeyange) CC
 
 ### [](#header-3)关于该网站
 
 本站点所有代码均基于 <a href="https://github.com/tocttou/hacker-blog">https://github.com/tocttou/hacker-blog</a> 该开源项目，该项目遵循CC0 1.0协议  
-访问该网站表示你完全接受以下协议:  
-<iframe src="https://creativecommons.org/licenses/by-nc/1.0/deed.zh-hans"  style="background-color:#ffffff;width:30vw;">
-  <p>您的浏览器不支持  iframe 标签。</p>
-</iframe>  
-<a href="https://creativecommons.org/licenses/by-nc/3.0/deed.zh-hans">CC0 1.0 协议 - 中文版</a>  
-
 
 为优化访问速度，本站点接纳了多个不同地区的cdn、图床服务，具体供应商如下所示:  
 github - 网站服务  
@@ -44,3 +33,21 @@ github pages - 图床服务
 # [](#header-1)联系
 
 邮箱：<a href="mailto:leeyang928320@gmail.com">leeyang928320@gmail.com</a>
+
+
+访问该网站表示你完全接受以下协议:  
+<iframe src="https://creativecommons.org/licenses/by-nc/3.0/deed.zh-hans"  style="background-color:#ffffff;width:30vw;">
+  <p>您的浏览器不支持  iframe 标签。</p>
+</iframe>  
+<a href="https://creativecommons.org/licenses/by-nc/3.0/deed.zh-hans">CreativeCommon 3.0 协议 - 中文版</a>  
+
+<iframe src="https://creativecommons.org/licenses/by-nc/1.0/deed.zh-hans"  style="background-color:#ffffff;width:30vw;">
+  <p>您的浏览器不支持  iframe 标签。</p>
+</iframe>  
+<a href="https://creativecommons.org/licenses/by-nc/3.0/deed.zh-hans">CC0 1.0 协议 - 中文版</a>  
+
+<iframe src="https://opensource.org/license/MIT/"  style="background-color:#ffffff;width:30vw;">
+  <p>您的浏览器不支持  iframe 标签。</p>
+</iframe>  
+<a href="https://opensource.org/license/MIT/">MIT 协议</a>  
+
