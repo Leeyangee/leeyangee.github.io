@@ -23,7 +23,7 @@ title: 关于
 本站点所有代码均基于<a href="https://github.com/tocttou/hacker-blog">https://github.com/tocttou/hacker-blog</a>该开源项目，该项目遵循CC0 1.0协议  
 <a href="https://creativecommons.org/licenses/by-nc/3.0/deed.zh-hans">CC0 1.0 协议 - 中文版</a>  
 本站点核心框架基于<a href="https://github.com/jekyll/jekyll">https://github.com/jekyll/jekyll</a>搭建，Jekyll是一个上层静态页面框架，该框架遵循MIT协议  
-<a href="https://opensource.org/license/MIT/">MIT 协议</a>  
+<a href="https://opensource.org/license/MIT/">MIT 协议 - 英文版</a>  
 
 为优化访问速度，本站点接纳了多个不同地区的cdn、图床服务，具体供应商如下所示:  
 github - 网站服务  
