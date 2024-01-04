@@ -17,7 +17,7 @@ published: true
 </details><p></p>
 
 <details>
-      <summary><font color="#2bbc8a">CVE-2023-*****</font>: 阿里巴巴集团 某系统, Command Execution</summary>
+      <summary><font color="#2bbc8a">CNVD-2023-*****</font>: 阿里巴巴集团 某系统, Command Execution</summary>
       <pre><code>
 请关注厂商修复信息：<a id="rep">https://www.alibaba.com/</a>
       </code></pre>
