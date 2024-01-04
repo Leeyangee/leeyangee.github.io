@@ -3,9 +3,9 @@ title: Common-Record
 published: true
 ---
 
-在此记录discovered by leeya_bug(leeyange、Leeyange)通用漏洞数据  
+在此记录由leeya_bug发现的(leeyange、Leeyange)通用漏洞数据  
 (非完全, 所展示的通用漏洞数据仅具有示例性)  
-部分公开的数据标准一定满足以下条件: 符合通用型系统漏洞的标准(应用系统、web系统、操作系统漏洞等)  
+部分公开的数据标准一定满足以下条件: 符合通用型系统漏洞的标准(应用系统、web系统、操作系统漏洞等)、被多个知名漏洞库收录  
 完全公开的数据标准一定满足以下条件: 符合部分公开的数据标准、非在野漏洞、符合当地法律法规  
 
 <br>
