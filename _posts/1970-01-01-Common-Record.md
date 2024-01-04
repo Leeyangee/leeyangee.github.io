@@ -21,6 +21,8 @@ published: true
       <pre><code>
 请关注厂商修复信息：<a id="rep">https://www.alibaba.com/</a>
       </code></pre>
+</details><p></p>
+
 <details>
       <summary><font color="#2bbc8a">CNVD-YCGW-20231004****</font>: 某系统, Sensi Info Leak</summary>
       <pre><code>
