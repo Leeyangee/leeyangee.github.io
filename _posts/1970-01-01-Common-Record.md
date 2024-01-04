@@ -3,7 +3,7 @@ title: Common-Record
 published: true
 ---
 
-在此记录由leeya_bug发现的(leeyange、Leeyange)通用型漏洞  
+在此记录由leeya_bug挖掘的通用型漏洞  
 <details>
       <summary>(非完全, 所展示的通用漏洞数据仅具有示例性)</summary>
       <pre>部分公开的数据标准一定满足以下条件: 符合通用型系统漏洞的标准(应用系统、web系统、操作系统漏洞等)、被多个知名漏洞库收录  
