@@ -28,13 +28,6 @@ published: true
 </details><p></p>
 
 <details>
-      <summary><font color="#2bbc8a">CNVD-YCGW-20231004****</font>: 某系统, Sensi Info Leak</summary>
-      <pre><code>
-根据相关法律法规，漏洞细节暂不公开
-      </code></pre>
-</details><p></p>
-
-<details>
       <summary><font color="#2bbc8a">CVE-2023-39654</font>: abu/abupy <= 0.4.0, SQL Injection</summary>
       <pre><code>
 <a id="cve_addr">CVE-2023-39654</a>
