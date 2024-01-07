@@ -98,7 +98,7 @@ published: true
 </details><p></p>
 
 <details>
-      <summary><font color="#2bbc8a">CVE-2023-37658</font>: fast-poster v2.15.0, Stored XSS, python</summary>
+      <summary><font color="#2bbc8a">CVE-2023-37658</font>: fast-poster v2.15.0, Stored XSS</summary>
       <pre><code>
 <a id="cve_addr">CVE-2023-37658</a>
 仓库地址: <a id="rep">https://gitee.com/psoho/fast-poster</a>
@@ -108,7 +108,7 @@ published: true
 </details><p></p>
 
 <details>
-      <summary><font color="#2bbc8a">CVE-2023-37656</font>: WebsiteGuide v0.2, RCE, python</summary>
+      <summary><font color="#2bbc8a">CVE-2023-37656</font>: WebsiteGuide v0.2, RCE</summary>
       <pre><code>
 <a id="cve_addr">CVE-2023-37656</a>
 仓库地址: <a id="rep">https://github.com/mizhexiaoxiao/WebsiteGuide</a>
@@ -116,7 +116,7 @@ published: true
 </details><p></p>
 
 <details>
-      <summary><font color="#2bbc8a">CVE-2023-37657</font>: TwoNav v2.0.28-20230624, Sensitive Data Explosion, python</summary>
+      <summary><font color="#2bbc8a">CVE-2023-37657</font>: TwoNav v2.0.28-20230624, Sensitive Data Explosion</summary>
       <pre><code>
 <a id="cve_addr">CVE-2023-37657</a>
 仓库地址: <a id="rep">https://gitee.com/tznb/TwoNav</a>
