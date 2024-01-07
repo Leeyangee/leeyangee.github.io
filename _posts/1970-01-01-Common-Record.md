@@ -6,7 +6,7 @@ published: true
 在此记录由leeya_bug挖掘的通用型漏洞  
 <details>
       <summary>(非完全, 所展示的通用漏洞数据仅具有示例性)</summary>
-      <pre>部分公开的数据标准一定满足以下条件: 符合通用型系统漏洞的标准(应用系统、web系统、操作系统漏洞等)、被多个知名漏洞库收录  
+      <pre>部分公开的数据标准一定满足以下条件: 符合通用型系统漏洞的标准(应用系统、web系统、操作系统漏洞等)或反制型漏洞、被多个知名漏洞库收录  
 完全公开的数据标准一定满足以下条件: 符合部分公开的数据标准、非在野漏洞、符合当地法律法规  </pre>
 </details><p></p>
   
@@ -62,7 +62,7 @@ published: true
 </details><p></p>
 
 <details>
-      <summary><font color="#2bbc8a">CVE-2023-38943</font>: ShuiZe_0x727 v1.0, Command Execute</summary>
+      <summary><font color="#2bbc8a">CVE-2023-38943(反制型)</font>: ShuiZe_0x727 v1.0, Command Execute</summary>
       <pre><code>
 <a id="cve_addr">CVE-2023-38943</a>
 仓库地址: <a id="rep">https://github.com/0x727/ShuiZe_0x727</a>
@@ -121,14 +121,6 @@ published: true
 <a id="cve_addr">CVE-2023-37657</a>
 仓库地址: <a id="rep">https://gitee.com/tznb/TwoNav</a>
 测试网站: <a id="rep">https://two.lm21.top</a>
-      </code></pre>
-</details><p></p>
-
-<details>
-      <summary><font color="#2bbc8a">Private</font>:  web_chat, Stored XSS, php</summary>
-      <pre><code>
-<a>Private</a>
-仓库地址: <a id="rep">https://github.com/jacky-zeng/web_chat</a>
       </code></pre>
 </details><p></p>
 
