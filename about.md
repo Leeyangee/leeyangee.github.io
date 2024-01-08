@@ -8,6 +8,7 @@ title: 关于
 # [](#header-1)联系
 
 欢迎志同道合的朋友同我们一起深入探讨安全、算法、区块链等相关领域的技术细节  
+以及帮助我们优化、改进我们的网站或工具  
 邮箱：<a href="mailto:leeyang928320@gmail.com">leeyang928320@gmail.com</a>  
 
 # [](#header-1)免责声明
