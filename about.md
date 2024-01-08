@@ -8,7 +8,6 @@ title: 关于
 # [](#header-1)联系
 
 欢迎各位志同道合的师傅同我一起深入探讨安全、算法、区块链等领域相关方面的技术细节  
-QQ: 3140443682  
 邮箱：<a href="mailto:leeyang928320@gmail.com">leeyang928320@gmail.com</a>
 
 # [](#header-1)免责声明
