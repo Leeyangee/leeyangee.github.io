@@ -3,6 +3,14 @@ layout: page
 title: 关于
 ---
 
+
+
+# [](#header-1)联系
+
+欢迎各位志同道合的师傅同我一起深入探讨安全、算法、区块链等领域相关方面的技术细节  
+QQ: 3140443682  
+邮箱：<a href="mailto:leeyang928320@gmail.com">leeyang928320@gmail.com</a>
+
 # [](#header-1)免责声明
 
 本站点所有文章均过滤资产方敏感信息，攻击手段、审计思路、核心代码均避开关键思路  
@@ -35,8 +43,4 @@ github pages - 图床服务
 # [](#header-1)隐私声明
 
 为统计网站访问量，本站点会且仅会收集你的如下信息: 访问者的公网IP、访问者的访问时间
-
-# [](#header-1)联系
-
-邮箱：<a href="mailto:leeyang928320@gmail.com">leeyang928320@gmail.com</a>
 
