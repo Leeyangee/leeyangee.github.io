@@ -13,6 +13,14 @@ published: true
 
 
 <br>
+
+<details>
+            <summary><font color="#2bbc8a">CVE-2024-****</font>: 百度公司 某系统, File Write</summary>
+      <pre><code>
+请关注厂商修复信息：<a id="rep">http://www.baidu.com</a>
+      </code></pre>
+</details><p></p>
+
 <details>
             <summary><font color="#2bbc8a">CVE-2023-52314</font>: 百度公司 Paddle <= 2.6.0, Command Execution</summary>
       <pre><code>
