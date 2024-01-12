@@ -22,7 +22,7 @@ published: true
 </details><p></p>
 
 <details>
-            <summary><font color="#2bbc8a">CVE-2023-52314</font>: 百度公司 Paddle <= 2.6.0, Command Execution</summary>
+            <summary><font color="#2bbc8a">CVE-2023-52314</font>: 百度公司 Paddle框架 <= v2.6.0, Command Execution</summary>
       <pre><code>
 请关注厂商修复信息：<a id="rep">http://www.baidu.com</a>
       </code></pre>
@@ -36,7 +36,7 @@ published: true
 </details><p></p>
 
 <details>
-      <summary><font color="#2bbc8a">CVE-2023-39654</font>: abu/abupy <= 0.4.0, SQL Injection</summary>
+      <summary><font color="#2bbc8a">CVE-2023-39654</font>: abu/abupy <= v0.4.0, SQL Injection</summary>
       <pre><code>
 <a id="cve_addr">CVE-2023-39654</a>
 仓库地址: <a id="rep">https://github.com/bbfamily/abu</a>
