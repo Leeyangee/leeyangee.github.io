@@ -146,6 +146,4 @@ published: true
       //cve_box = document.getElementById("all");
       //cve_box.innerHTML += '<details><summary><font color="#2bbc8a">CVE-2023-test</font>:  web_chat, Stored XSS, php</summary><pre><code><a id="cve_addr">CVE-2023-37651</a><br>仓库地址: <a id="rep">https://github.com/jacky-zeng/web_chat</a><br></code></pre></details><p></p>';
 </script>
-<script src="https://raw.githubusercontent.com/Leeyangee/leeya_bug/main/leeya_bug/cve.js">leeya_bug_cve();</script>
-
 
