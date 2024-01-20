@@ -37,5 +37,5 @@ bugctf是一个小型的基于python3.6的包，由suse_bug团队共同开发，
 
 
 pip安装: `pip3 install bugctf`  
-<font color=FF0000>由于潜在的安全风险，该库已被pypi官方暂时重审</font>
+<font color=FF0000>由于潜在的安全风险，该库已被pypi官方暂时下架重审</font>
 
