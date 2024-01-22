@@ -7,7 +7,8 @@ title: 开源工作
 基本语言: Python3  
 最新版本: 1.1.2  
 
-bugctf是一个小型的基于python3.6的包，由suse_bug团队共同开发，其包含了多种CTF常见算法及数据可视化API和配套的完整方法注释，专注于提升CTF和渗透实战的效率  
+bugctf是一个小型的基于python3.6的包，自leectf项目改进而来，由suse_bug团队共同开发.  
+其包含了多种CTF常见算法及数据可视化API和配套的完整方法注释，专注于提升CTF和渗透实战的效率，为各类渗透活动、攻防演练行动提供通用安全解决方案  
 
 <details>
       <summary><font color="#2bbc8a">生成二阶希尔伯特曲线:</font></summary>
@@ -36,6 +37,4 @@ bugctf是一个小型的基于python3.6的包，由suse_bug团队共同开发，
 </details><p></p>
 
 
-pip安装: `pip3 install bugctf`  
-<font color=FF0000>由于潜在的安全风险，该库已被pypi官方暂时下架重审</font>
-
+pip安装(暂不可用): `pip3 install bugctf`  
