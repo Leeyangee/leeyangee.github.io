@@ -65,7 +65,7 @@ published: true
 </details><p></p>
 
 <details>
-      <summary><font color="#2bbc8a">CVE-2023-38943(反制型漏洞)</font>: ShuiZe_0x727 v1.0, Command Execute</summary>
+      <summary><font color="#2bbc8a">CVE-2023-38943(反制型)</font>: ShuiZe_0x727 v1.0, Command Execute</summary>
       <pre><code>
 <a id="cve_addr">CVE-2023-38943</a>
 仓库地址: <a id="rep">https://github.com/0x727/ShuiZe_0x727</a>
