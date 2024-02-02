@@ -10,7 +10,7 @@ published: true
 <br>
 
 <details>
-            <summary><font color="#2bbc8a">CVE-2024-****</font>: 百度公司 某系统, File Cover/Write</summary>
+            <summary><font color="#2bbc8a">CNVD-2024-02***</font>: 百度公司 某系统, File Cover/Write</summary>
       <pre><code>
 请关注厂商修复信息：<a id="rep">http://www.baidu.com</a>
       </code></pre>
