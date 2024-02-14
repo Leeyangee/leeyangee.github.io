@@ -1,4 +1,9 @@
 
+---
+layout: page
+title: 隐私声明
+---
+
 # [](#header-1)免责声明
 
 若发布的文章侵犯了资产方利益/知识产权，请联系邮箱：<a href="mailto:leeyang928320@gmail.com">leeyang928320@gmail.com</a>，本站点将在三天之内给予答复  
