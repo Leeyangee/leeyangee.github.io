@@ -1,7 +1,6 @@
-
 ---
 layout: page
-title: 隐私声明
+title: 网站声明
 ---
 
 # [](#header-1)免责声明
