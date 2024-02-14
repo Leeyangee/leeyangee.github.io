@@ -3,7 +3,11 @@ layout: page
 title: 关于
 ---
 
-一个就读于西南某双非Software Engineering专业的学生，热爱信息安全技术、爱好提交质量优秀的pr和造轮子
+一个就读于西南某双非Software Engineering系的学生
+
+热爱信息安全技术，爱好提交质量优秀的pr和造轮子
+
+热爱Minecraft，热衷于体验具有深度的独立游戏.
 
 # [](#header-1)联系
 
