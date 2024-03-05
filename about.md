@@ -5,7 +5,7 @@ title: 关于
 
 一个就读于西南某双非Software Engineering系的学生
 
-现欧盟信息安全名人堂成员，擅长使用Go、Python等轻量编程语言开发，热爱代码审计. 
+现欧盟信息安全名人堂成员. 擅长使用Go、Python等轻量编程语言开发，擅长传统框架的代码审计. 
 
 热衷于算法和数模竞赛，爱好无脑using ns std和使用matlab计算高数题
 
