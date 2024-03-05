@@ -2,10 +2,10 @@
 title: 数据库
 published: true
 ---
+<!--
 
 在此记录由leeya_bug挖掘的通用型漏洞  
 (非完全)  
-
 
 <br>
 
@@ -141,4 +141,6 @@ published: true
       //cve_box = document.getElementById("all");
       //cve_box.innerHTML += '<details><summary><font color="#2bbc8a">CVE-2023-test</font>:  web_chat, Stored XSS, php</summary><pre><code><a id="cve_addr">CVE-2023-37651</a><br>仓库地址: <a id="rep">https://github.com/jacky-zeng/web_chat</a><br></code></pre></details><p></p>';
 </script>
+
+-->
 
