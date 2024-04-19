@@ -11,6 +11,12 @@ $header: $conifer !default;
 $blockquote-color: $silver-chalice !default;
 $blockquote-border: $dove-grey !default;
 
+@font-face {
+  font-style: normal;
+  font-family: "Meslo LG";
+  src: local("Meslo LG S"),url(/assets/MesloLGS-Regular.ttf) format("truetype")
+}
+
 .leeya_good {
    background:
   url("https://s11.ax1x.com/2024/02/11/pF3XXEF.jpg") no-repeat,
