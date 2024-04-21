@@ -10,7 +10,6 @@ title: 关于
 曾经打过算法和数模竞赛，经常无脑using ns std和使用matlab计算高数题
 
 热爱Minecraft，喜欢如96号公路、Cyberpunk 2077等反乌托邦、赛博朋克题材的游戏，热衷于体验具有深度的独立游戏  
-很喜欢一个黑客游戏叫hacknet，因为
 
 # [](#header-1)联系
 
