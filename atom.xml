@@ -13,6 +13,20 @@ layout: null
       <email>{{ site.author.email }}</email>
       <uri>{{ site.author.url }}</uri>
     </author>
+    <item>
+      <title>leeya_bug渗透测试记录 - 赛博安全研究 - CyberSecurity Learn And Research</title>
+      <description>leeya_bug渗透测试记录 - 赛博安全研究 - CyberSecurity Learn And Research</description>
+      <link>https://leeyabug.top</link>
+      <link href="https://leeyabug.top"/>
+      <guid isPermaLink="true">https://leeyabug.top</guid>
+    </item>
+    <item>
+      <title>关于 leeya_bug</title>
+      <description>关于 leeya_bug</description>
+      <link>https://leeyabug.top/about</link>
+      <link href="https://leeyabug.top/about"/>
+      <guid isPermaLink="true">https://leeyabug.top/about</guid>
+    </item>
     {% for post in site.posts limit:10 %}
       <item>
         <title>{{ post.title | xml_escape }}</title>
