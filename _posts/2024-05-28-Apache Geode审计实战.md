@@ -1,5 +1,5 @@
 ---
-title: Apache Geode 审计现场实战 - 漏洞链构造/实时更新
+title: Apache Geode审计现场实战 - 漏洞链构造/实时更新
 published: true
 ---
 
