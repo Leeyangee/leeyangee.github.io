@@ -10,7 +10,7 @@ published: true
 
 如果没审出来 RCE 也没关系，至少能学习到最优秀的程序员 coding 风格、审计思路和得到一堆本地命令执行漏洞  
 
-| 利用链跳转 |
+| 目录/利用链跳转 |
 |--------|
 | [利用链 1: CacheServerHelper.deserialize(Args)](#利用链-1) |
 | [利用链 2: ](#利用链-2) |
@@ -30,7 +30,6 @@ Apache Geode 的官方仓库：[https://github.com/apache/geode](https://github.
 笔者注意到 org.apache.geode.internal.cache.tier.sockets.CacheServerHelper 被该中间件广泛使用在 client 和 server 的 Cache 交互中的处理文件或对象反序列化场景，而该对象关键三个方法如下所示  
 
 ```java
-
 public class CacheServerHelper {
     public static Object deserialize(byte[] blob) throws IOException, ClassNotFoundException {
         return deserialize(blob, false);
@@ -65,7 +64,6 @@ public class PdxInputStream extends ImmutableByteBufferInputStream
 basicReadObject 关键代码解析如下所示
 
 ```java
-
 public abstract class InternalDataSerializer extends DataSerializer {
 
     public static Object basicReadObject(DataInput in) throws IOException, ClassNotFoundException {
@@ -134,7 +132,6 @@ public abstract class InternalDataSerializer extends DataSerializer {
         }
         ...[下面的代码省略]..
     }
-
 }
 
 ```
