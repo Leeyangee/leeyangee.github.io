@@ -13,7 +13,7 @@ published: false
 | 目录/利用链跳转 |
 |--------|
 | [利用链 1: CacheServerHelper.deserialize(Args)](#利用链-1) |
-| [利用链 2: ](#利用链-2) |
+| [利用链 1.1: 基于 利用链1 直接到达用户 interface](#利用链-11) |
 
 
 # [](#header-31)Apache Geode介绍
@@ -156,6 +156,7 @@ public class Payload1 {
 
 ```
 
-# [](#header-31)利用链 2:
+# [](#header-31)利用链 1.1:
+# [](#header-31)基于 利用链1 直接到达用户 interface
 
 由于今天太晚了，明天再更新
