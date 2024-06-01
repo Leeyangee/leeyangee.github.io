@@ -34,7 +34,7 @@ published: true
     <a href="#漏洞agvl-01">AGVL-01漏洞: Apache Geode 客户端反序列化RCE漏洞(基于漏洞链2)</a>
   </td></tr>
   <tr><td>
-    <a href="#漏洞链-3">漏洞链 3: 暂未更新</a>
+    <a href="#漏洞链-3">漏洞链 3: </a>
   </td></tr>
   <tr><td>
     <a href="#一些个人建议">一些个人建议</a>
@@ -45,10 +45,10 @@ published: true
 | 目录跳转 |
 |--------|
 | [漏洞链 1: CacheServerHelper.deserialize(Args)](#漏洞链-1) |
-| [漏洞链 2: 基于漏洞链1直接到达用户 interface](#漏洞链-2) |
+| [漏洞链 2: 基于漏洞链1直达用户 interface](#漏洞链-2) |
 | [AGVL-01漏洞: Apache Geode 客户端反序列化RCE漏洞(基于漏洞链2)](#漏洞agvl-01) |
-| [漏洞链 3: 暂未更新](#漏洞链-3) |
-| [对Apache Geode开发者的一些建议](#对该中间件开发者的一些建议) |
+| [漏洞链 3: ](#漏洞链-3) |
+| [一些个人建议](#一些个人建议) |
 
 # [](#header-31)Apache Geode介绍
 
@@ -95,7 +95,7 @@ public class PdxInputStream extends ImmutableByteBufferInputStream
 继续跟进 basicReadObject，其方法流程分析:  
 1. 该方法首先先调用 DscodeHelper.toDSCODE 获取 header 判断文件类型后，根据类型进行解析操作. 在此直接取出 DSCODE 枚举类然后观察变量映射即可，笔者不赘述. 观察得知 44 为 SERIALIZABLE  
 
-2. 继续如下 switch case 流程，笔者发现当 header 等于 SERIALIZABLE 时，能直接进入 readSerializable 然后调用 readObject  
+2. 继续如下 switch (headerDSCode) 流程，笔者发现当 header 等于 SERIALIZABLE 时，能直接进入 readSerializable 然后调用 readObject  
 
 basicReadObject 关键代码解析如下所示
 
@@ -199,7 +199,7 @@ public class Payload1 {
 ```
 
 # [](#header-31)漏洞链 2:
-# [](#header-31)基于漏洞链1直接到达用户 interface
+# [](#header-31)基于漏洞链1直达用户 interface
 
 在漏洞链2的构造过程中需要连接服务器并动态调试，因此笔者使用了IP为 172.245.82.84 的笔者合法购买的服务器，谁想打谁打吧反正就一个22端口
 
@@ -238,11 +238,16 @@ public class Main {
 
 ![avatar](/image/2024-06-01-1.png)  
 
-在重复地 Resume 了几次后，笔者终于发现这里有了非 0 的输入流，如下所示  
+在重复地 Resume 了几次后，笔者终于发现这里有了非 0 的输入流  
+该输入流的类型为 ByteArrayDataInput 如下所示  
 
 ![avatar](/image/2024-06-01-2.png)  
 
-继续跟进该输入流，发现还是到了利用链1中 switch (headerDSCode) 那一步，如果构造该流的头部一字节值为 44 并植入恶意 Payload，那就会顺理成章地反序列化 RCE
+继续跟进该输入流，发现还是到了利用链1中 switch (headerDSCode) 那一步，如果此时构造该流的头部一字节值为 44 并植入恶意 Payload，那就会顺理成章地反序列化 RCE
+
+![avatar](/image/2024-06-01-5.png)  
+`*工厂create`
+
 
 接下来总结该数据的规律:  
 经过笔者多次反复重启 + Resume 观测后发现该流的 header 固定为 015C04AC ，且长度普遍在 80 - 100 的区间范围内.   
@@ -318,13 +323,13 @@ queue.run()
 
 # [](#header-31)漏洞链 3:
 
-今天星期六休息
+周末周日休息
 
 # [](#header-31)一些个人建议
 
 在Apache Geode中，有那么一些小特性：
 
-1. Apache Geode 创建的 server、locator 绑定的IP必须与用户在同一子网下，使用穿透、端口映射等方法均完全无法正常访问，同理对于 docker 镜像部署几乎属于 0 支持(这听起来十分离谱，不像是一个现代框架该有的特性，但是经过笔者个人在Stack Overflow上搜集求证后发现其是真实的)
+1. Apache Geode 创建的 server、locator 绑定的IP必须与用户在同一子网下，使用穿透、端口映射等方法均完全无法正常访问，同理对于 docker 镜像部署几乎属于 0 支持
 2. 官方文档缺斤少两：无论是中文的文档还是英文的文档，都是缺斤少两. 很多函数调用细节都是笔者猜想出来的
 3. 对于个人用户的支持性极差：几乎只适合企业级场景
 4. 错误处理极为奇葩：笔者在动态调试过程中只收到过一类正确的 Exception，当然是笔者自己忘记 docker 映射端口的原因，后续收到的 Exceptions 几乎都是无脑 throw 底部栈
