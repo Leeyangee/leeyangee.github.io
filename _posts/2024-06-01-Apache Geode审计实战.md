@@ -3,7 +3,7 @@ title: Apache Geode审计现场实战 - 漏洞链构造/实时更新
 published: true
 ---
 
-这段时间笔者审计在此之前遇到的一个 Apache 中间件 Apache Geode，并且会在这里实时开源自己新鲜审计出来的漏洞链和已经审计出来的 RCE 漏洞，供读者学习  
+这段时间笔者审计在此之前遇到的一个 Apache 中间件 Apache Geode，并且会在这里实时开源自己新鲜审计出来的漏洞链 和 已经审计出来的 RCE 漏洞，供读者学习  
 
 如果有人利用笔者的思路/漏洞链继续审出来RCE也没关系(反正咱也不缺这一个)，这篇文章提到的漏洞链都是完全开放的，把洞卖了能分点钱给我就行(bushi). 审不出来也没关系哦，至少能学习到最优秀的程序员 coding 风格
 
@@ -20,6 +20,28 @@ published: true
   </td></tr>
 </table>
 
+<table style="border:1px solid #2bbc8a;border-collapse: collapse" border="1">
+  <tr><td>
+    目录跳转
+  </td></tr>
+  <tr><td>
+    <a href="#漏洞链-1">漏洞链 1: CacheServerHelper.deserialize(Args)</a>
+  </td></tr>
+  <tr><td>
+    <a href="#漏洞链-2">漏洞链 2: 基于漏洞链1直接到达用户 interface</a>
+  </td></tr>
+  <tr><td>
+    <a href="#漏洞agvl-01">AGVL-01漏洞: Apache Geode 客户端反序列化RCE漏洞(基于漏洞链2)</a>
+  </td></tr>
+  <tr><td>
+    <a href="#漏洞链-3">漏洞链 3: 暂未更新</a>
+  </td></tr>
+  <tr><td>
+    <a href="#一些个人建议">一些个人建议</a>
+  </td></tr>
+</table>
+
+<!--
 | 目录跳转 |
 |--------|
 | [漏洞链 1: CacheServerHelper.deserialize(Args)](#漏洞链-1) |
@@ -27,6 +49,7 @@ published: true
 | [AGVL-01漏洞: Apache Geode 客户端反序列化RCE漏洞(基于漏洞链2)](#漏洞agvl-01) |
 | [漏洞链 3: 暂未更新](#漏洞链-3) |
 | [对Apache Geode开发者的一些建议](#对该中间件开发者的一些建议) |
+-->
 
 # [](#header-31)Apache Geode介绍
 
@@ -236,8 +259,7 @@ public class Main {
 # [](#header-31)Apache Geode 客户端反序列化RCE漏洞(基于漏洞链2)
 
 接下来笔者需要做的事情就是构造一个伪服务端，拦截发送到客户端的 TCP 流量后观察其 Data 头部是否为 015C04AC，若是，则将 Data 替换为漏洞链1的 Payload  
-`b',\xac\xed\x00\x05sr\x00\x11org.example.HACK2\xcb\xa8s\x8d\xc3mwj\x02\x00\x00xp'`
-
+`b',\xac\xed\x00\x05sr\x00\x11org.example.HACK2\xcb\xa8s\x8d\xc3mwj\x02\x00\x00xp'`  
 上面这段话看似简单，实际上要实现并非简单. 基于 TCP 协议的 Geode 协议并非类似于应用层 HTTP(s) 这种协议，想拦就拦想改就改. 按照以往流程，笔者需要在 Linux 服务器上写个 hook 函数直接拦截 TCP 流量并观察其内容  
 
 不过笔者又不想写 hook，只能找到了一个 Scapy + netfilterqueue 已经替用户封装好了的替代方案，通过 iptables 重定向流量导入 netfilterqueue 后再编写 Python 代码从 netfilterqueue 中抓取 TCP 流量
@@ -280,17 +302,18 @@ queue.bind(0, p)
 queue.run()
 ```
 
-在配置完毕后，运行客户端连接 172.245.82.84 时直接弹计算器出来，证明此处存在命令执行漏洞  
+在所有的一切配置完毕后，我们的伪服务端就已经构造完毕了.  
+接下来运行客户端连接 172.245.82.84 时直接弹计算器出来，证明此处存在命令执行漏洞  
 
 ![avatar](/image/2024-06-01-4.png)  
 
-这部分笔者还未提交至任何漏洞平台，仅在此公开，原因如下：
+该漏洞笔者还未提交至任何漏洞平台，仅在此公开，原因如下：
 
 1. Apache Geode 部署流程、伪服务器构造过程都比较棘手，搞坏了我两台服务器真机(不包括 docker)的配置环境
 2. 鉴于复现过程中受到远程/本地缓存的影响，客户端多次向服务端获取缓存后，很可能就不获取了，也就无法触发该漏洞
 3. 笔者学业繁忙，如果想要达到 100% 复现率，需要花半把个月时间将整个 Geode 协议吃透，而本篇文章仅为学习用途，因此无任何深入研究  Geode 协议并将其利益化的必要
 
-总之如果有想部署复现、学习的读者可以联系笔者参考，想拿来交 CVE 的读者就随便交吧
+总之如果有想部署复现、学习的读者可以联系笔者参考
 
 至于为什么该漏洞编号为 AGVL-01 呢？是因为 AGVL 是 Apache Geode Vulnerability by leeya_bug 的简称
 
@@ -298,7 +321,7 @@ queue.run()
 
 今天星期六休息
 
-# [](#header-31)对该中间件开发者的一些建议
+# [](#header-31)一些个人建议
 
 在Apache Geode中，有那么一些小特性：
 
@@ -307,7 +330,7 @@ queue.run()
 3. 对于个人用户的支持性极差：几乎只适合企业级场景
 4. 错误处理极为奇葩：笔者在动态调试过程中只收到过一类正确的 Exception，当然是笔者自己忘记 docker 映射端口的原因，后续收到的 Exceptions 几乎都是无脑 throw 底部栈
 
-笔者个人的建议是：  
+笔者对开发者的一些建议：  
 
 1. 希望 Apache Geode 在网络数据交互方面能有更多的优化和测试
-2. 如<!--果一个开发者只是对于软件架构理解地好，对于网络编程几乎0掌握，那我建议他千万千万别来搞 Web 开发，千万别来写中间件，自己开发的东西为什么没人用自己没有点b数吗？-->
+2. 如<!--果一个开发者只是对于软件架构理解地好，对于网络编程几乎0掌握，那我建议他千万千万别来搞 Web 开发，千万别来写中间件，自己开发的东西为什么没什么人用自己没有点b数吗？-->
