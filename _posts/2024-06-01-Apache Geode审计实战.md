@@ -11,7 +11,7 @@ published: true
 
 <table style="border:1px solid #2bbc8a;border-collapse: collapse" border="1">
   <tr><td colspan="2">
-    当前由 leeya_bug 找出的 Apache Geode 漏洞
+    当前由 leeya_bug 发现的 Apache Geode 漏洞
   </td></tr>
   <tr><td>
     AGVL-01: Apache Geode 客户端反序列化RCE漏洞
@@ -317,9 +317,11 @@ queue.run()
 2. 鉴于复现过程中受到远程/本地缓存的影响，客户端多次向服务端获取缓存后，很可能就不获取了，也就无法触发该漏洞
 3. 笔者学业繁忙，如果想要达到 100% 复现率，需要花半把个月时间将整个 Geode 协议吃透，而本篇文章仅为学习用途，因此无任何深入研究  Geode 协议并将其利益化的必要
 
-总之如果有想部署复现、学习的读者可以联系笔者参考
+总之如果有想部署复现、学习的读者可以联系笔者参考，有想拿去交 CVE 的就交吧就当笔者送你的
 
+<!--
 至于为什么该漏洞编号为 AGVL-01 呢？是因为 AGVL 是 Apache Geode Vulnerability by leeya_bug 的简称
+-->
 
 # [](#header-31)漏洞链 3:
 
