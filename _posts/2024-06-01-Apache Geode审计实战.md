@@ -19,7 +19,7 @@ published: true
     由于客户端不正确地接收了来自服务端的数据流并将其误静态判断后反序列化，若攻击者伪造服务端/中间人攻击，将触发该反序列化漏洞
   </td></tr>
 </table>
-
+<!--
 <table style="border:1px solid #2bbc8a;border-collapse: collapse" border="1">
   <tr><td>
     目录跳转
@@ -40,8 +40,8 @@ published: true
     <a href="#一些个人建议">一些个人建议</a>
   </td></tr>
 </table>
+-->
 
-<!--
 | 目录跳转 |
 |--------|
 | [漏洞链 1: CacheServerHelper.deserialize(Args)](#漏洞链-1) |
@@ -49,7 +49,6 @@ published: true
 | [AGVL-01漏洞: Apache Geode 客户端反序列化RCE漏洞(基于漏洞链2)](#漏洞agvl-01) |
 | [漏洞链 3: 暂未更新](#漏洞链-3) |
 | [对Apache Geode开发者的一些建议](#对该中间件开发者的一些建议) |
--->
 
 # [](#header-31)Apache Geode介绍
 
