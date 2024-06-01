@@ -9,14 +9,6 @@ published: true
 
 在审计过程中也能学习到最优秀的程序员 coding 风格
 
-| 目录/漏洞链跳转 |
-|--------|
-| [漏洞链 1: CacheServerHelper.deserialize(Args)](#漏洞链-1) |
-| [漏洞链 2: 基于漏洞链1直接到达用户 interface](#漏洞链-2) |
-| [AGVL-01漏洞: Apache Geode 客户端反序列化RCE漏洞(基于漏洞链2)](#漏洞agvl-01) |
-| [漏洞链 3: 暂未更新](#漏洞链-3) |
-| [对Apache Geode开发者的一些建议](#对该中间件开发者的一些建议) |
-
 <table style="border:1px solid #2bbc8a;border-collapse: collapse" border="1">
   <tr><td colspan="2">
     由 leeya_bug 当前找出的 Apache Geode 漏洞
@@ -27,6 +19,14 @@ published: true
     由于客户端不正确地接收了来自服务端的数据流并将其误静态判断后反序列化，若攻击者伪造服务端/中间人攻击，将触发该反序列化漏洞
   </td></tr>
 </table>
+
+| 目录/漏洞链跳转 |
+|--------|
+| [漏洞链 1: CacheServerHelper.deserialize(Args)](#漏洞链-1) |
+| [漏洞链 2: 基于漏洞链1直接到达用户 interface](#漏洞链-2) |
+| [AGVL-01漏洞: Apache Geode 客户端反序列化RCE漏洞(基于漏洞链2)](#漏洞agvl-01) |
+| [漏洞链 3: 暂未更新](#漏洞链-3) |
+| [对Apache Geode开发者的一些建议](#对该中间件开发者的一些建议) |
 
 注意，本篇文章不遵循 CC4 协议，其内容均为 leeya_bug 所有，禁止转载
 
@@ -87,22 +87,26 @@ public abstract class InternalDataSerializer extends DataSerializer {
         checkIn(in);
         byte header = in.readByte(); //获取 header
         DSCODE headerDSCode = DscodeHelper.toDSCODE(header); //获取 header 映射值 
-        ...[日志省略]...
+        if (logger.isTraceEnabled(LogMarker.SERIALIZER_VERBOSE)) {
+            logger.trace(LogMarker.SERIALIZER_VERBOSE, "basicReadObject: header={}", header);
+        }
 
         if (headerDSCode == null) {
-            ...[错误处理，忽略]...
+            throw new IOException("Unknown header byte: " + header);
         } else {
             switch (headerDSCode) {
-
+                case DS_FIXED_ID_BYTE:
+                    return dsfidFactory.create(in.readByte(), in);
+                case DS_FIXED_ID_SHORT:
+                    return dsfidFactory.create(in.readShort(), in);
                 ...[省略几十个cases]...
 
                 case SERIALIZABLE:
                     return readSerializable(in); //继续跟进，调用 InputStream.readObject
 
                 ...[省略几十个cases]...
-
                 default:
-                    ...[错误处理，忽略]...
+                    throw new IOException("Unknown header byte: " + header);
             }
         }
     }
@@ -115,11 +119,11 @@ public abstract class InternalDataSerializer extends DataSerializer {
 public abstract class InternalDataSerializer extends DataSerializer {
 
     private static Serializable readSerializable(final DataInput in) throws IOException, ClassNotFoundException {
-        ...[日志省略]...
+        boolean isDebugEnabled_SERIALIZER = logger.isTraceEnabled(LogMarker.SERIALIZER_VERBOSE);
         Serializable serializableResult;
         //这里是 PdxInputStream 因此不进入
         if (in instanceof DSObjectInputStream) {
-            ...[不会进入该判断]...
+            serializableResult = (Serializable)((DSObjectInputStream)in).readObject();
         } else {
             InputStream stream;
             if (in instanceof InputStream) {
@@ -139,9 +143,12 @@ public abstract class InternalDataSerializer extends DataSerializer {
             //强转为 DSObjectInputStream
             ObjectInput ois = new DSObjectInputStream(stream);
             serializationFilter.setFilterOn((ObjectInputStream)ois);
-            //这里虽然 DSObjectInputStream 是其子类，但无其他判断故省略  
+            //这里虽然 DSObjectInputStream 是其子类，但无其他判断故跳过 
             if (stream instanceof VersionedDataStream) {
-                ...[日志省略]...
+                KnownVersion v = ((VersionedDataStream)stream).getVersion();
+                if (KnownVersion.CURRENT != v && v != null) {
+                    ois = new VersionedObjectInput((ObjectInput)ois, v);
+                }
             }
             //成功 readObject 反序列化
             serializableResult = (Serializable)((ObjectInput)ois).readObject();
@@ -222,7 +229,7 @@ public class Main {
 经过笔者多次反复重启 + Resume 观测后发现该流的 header 固定为 015C04AC ，且长度普遍在 80 - 100 的区间范围内.   
 接下来打开 WireShark 分析，多次运行并抓包看看是否能找到对应流量  
 
-找到最近监测的几条来自 172.245.82.84 的流量，终于发现某条 Geode 协议流量的 Data 段跟我们刚刚观测到的流量特征一模一样，如下红线处所示  
+找到最近监测的几条来自 172.245.82.84 的流量，终于发现某条 Geode 协议流量的 Data 数据段跟我们刚刚观测到的流量特征一模一样，如下红线处所示  
 
 ![avatar](/image/2024-06-01-3.png)  
 
