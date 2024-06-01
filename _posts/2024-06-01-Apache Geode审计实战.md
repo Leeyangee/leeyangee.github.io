@@ -3,15 +3,15 @@ title: Apache Geode审计现场实战 - 漏洞链构造/实时更新
 published: true
 ---
 
-这段时间笔者准备重新审计在此之前遇到的一个 Apache 中间件 Apache Geode，并且会在这里实时开源自己新鲜审计出来的漏洞链和已经审计出来的 RCE 漏洞，供读者学习  
+这段时间笔者审计在此之前遇到的一个 Apache 中间件 Apache Geode，并且会在这里实时开源自己新鲜审计出来的漏洞链和已经审计出来的 RCE 漏洞，供读者学习  
 
-如果有人利用笔者的思路/漏洞链继续审出来RCE也没关系(反正咱也不缺这一个)，这篇文章提到的漏洞链都是完全开放的，把洞卖了能分点钱给我就行(bushi)  
+如果有人利用笔者的思路/漏洞链继续审出来RCE也没关系(反正咱也不缺这一个)，这篇文章提到的漏洞链都是完全开放的，把洞卖了能分点钱给我就行(bushi). 审不出来也没关系哦，至少能学习到最优秀的程序员 coding 风格
 
-在审计过程中也能学习到最优秀的程序员 coding 风格
+注意，本篇文章不遵循 CC4 协议，其内容均为 leeya_bug 所有，禁止转载
 
 <table style="border:1px solid #2bbc8a;border-collapse: collapse" border="1">
   <tr><td colspan="2">
-    由 leeya_bug 当前找出的 Apache Geode 漏洞
+    当前由 leeya_bug 找出的 Apache Geode 漏洞
   </td></tr>
   <tr><td>
     AGVL-01: Apache Geode 客户端反序列化RCE漏洞
@@ -20,7 +20,7 @@ published: true
   </td></tr>
 </table>
 
-| 目录/漏洞链跳转 |
+| 目录跳转 |
 |--------|
 | [漏洞链 1: CacheServerHelper.deserialize(Args)](#漏洞链-1) |
 | [漏洞链 2: 基于漏洞链1直接到达用户 interface](#漏洞链-2) |
@@ -28,7 +28,6 @@ published: true
 | [漏洞链 3: 暂未更新](#漏洞链-3) |
 | [对Apache Geode开发者的一些建议](#对该中间件开发者的一些建议) |
 
-注意，本篇文章不遵循 CC4 协议，其内容均为 leeya_bug 所有，禁止转载
 
 
 # [](#header-31)Apache Geode介绍
