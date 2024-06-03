@@ -13,12 +13,14 @@ published: true
   <tr><td colspan="2">
     当前由 leeya_bug 发现的 Apache Geode 漏洞
   </td></tr>
-  <tr><td>
+  <tr>
+    <td>
     AGVL-01: Apache Geode 客户端反序列化 RCE 漏洞
-  </td><td>
+    </td>
+    <td>
     由于客户端在连接服务端的 handshake 过程中接收了来自服务端的数据流但不正确地将其误静态处理后反序列化，若攻击者在此过程中伪造服务端/中间人攻击，将触发该反序列化漏洞并最终导致命令执行漏洞
-  </td></tr>
-  </td></tr>
+    </td>
+  </tr>
 </table>
 <!--
 <table style="border:1px solid #2bbc8a;border-collapse: collapse" border="1">
