@@ -5,7 +5,7 @@ published: true
 
 这段时间笔者审计在此之前遇到的一个 Apache 中间件 Apache Geode，并且会在这里实时开源自己新鲜审计出来的漏洞链 和 已经审计出来的 RCE 漏洞，供读者学习  
 
-如果有人利用笔者的思路/漏洞链继续审出来RCE也没关系(反正咱也不缺这一个)，这篇文章提到的漏洞链都是完全开放的，把洞卖了能分点钱给我就行(bushi).  
+如果有人利用笔者的思路/漏洞链继续审出来RCE也没关系，这篇文章提到的漏洞链都是完全开放的，把洞卖了能分点钱给我就行(bushi).  
 
 注意，本篇文章不遵循 CC4 协议，其内容均为 leeya_bug 所有，禁止转载
 
@@ -17,6 +17,7 @@ published: true
     AGVL-01: Apache Geode 客户端反序列化 RCE 漏洞
   </td><td>
     由于客户端在连接服务端的 handshake 过程中接收了来自服务端的数据流但不正确地将其误静态处理后反序列化，若攻击者在此过程中伪造服务端/中间人攻击，将触发该反序列化漏洞并最终导致命令执行漏洞
+  </td></tr>
   </td></tr>
 </table>
 <!--
@@ -102,8 +103,8 @@ public class PdxInputStream extends ImmutableByteBufferInputStream
 basicReadObject 关键代码解析如下所示
 
 ```java
+//源码分析
 public abstract class InternalDataSerializer extends DataSerializer {
-
     public static Object basicReadObject(DataInput in) throws IOException, ClassNotFoundException {
         checkIn(in);
         byte header = in.readByte(); //获取 header
@@ -137,8 +138,8 @@ public abstract class InternalDataSerializer extends DataSerializer {
 继续跟进 readSerializable，逻辑是如果 in 继承 InputStream 了就直接强转为 InputStream，没有继承 InputStream 就写个 InputStream 的继承然后写个闭包的override read 方法(这个地方很重要，因为后续流很可能只实现了 DataInput)，如下所示  
 
 ```java
+//源码分析
 public abstract class InternalDataSerializer extends DataSerializer {
-
     private static Serializable readSerializable(final DataInput in) throws IOException, ClassNotFoundException {
         boolean isDebugEnabled_SERIALIZER = logger.isTraceEnabled(LogMarker.SERIALIZER_VERBOSE);
         Serializable serializableResult;
@@ -305,6 +306,7 @@ public class Main {
 而依据是什么？我们直接来到 org.apache.geode.cache.client.internal，观察 ConnectionConnector，关键在类型为 ConnectionImpl 的 connection 实例调用的 connect 方法，如下所示
 
 ```java
+//源码分析
 public class ConnectionConnector {
     public ConnectionImpl connectClientToServer(ServerLocation location, boolean forQueue) throws IOException {
         //初始化 connection
@@ -327,12 +329,14 @@ public class ConnectionConnector {
 connection.connect 中会调用 handshakeWithServer. 在多次握手后服务器将会发送 Member 至客户端，客户端在 readServerMember 方法中使用存在作为漏洞链1的一部分的反序列化函数直接读取 Member，是导致反序列化漏洞的直接原因
 
 ```java
+//源码分析
 public class ClientSideHandshakeImpl extends Handshake implements ClientSideHandshake {
     public ServerQueueStatus handshakeWithServer(Connection conn, ServerLocation location, CommunicationMode communicationMode) throws IOException, AuthenticationRequiredException, AuthenticationFailedException, ServerRefusedConnectionException {...}
 }
 ```
 
 ```java
+//源码分析
 public class ClientSideHandshakeImpl extends Handshake implements ClientSideHandshake {
     private InternalDistributedMember readServerMember(DataInputStream p_dis) throws IOException {
         //获取 InputStream 获取 byte[]
@@ -351,17 +355,17 @@ public class ClientSideHandshakeImpl extends Handshake implements ClientSideHand
 }
 ```
 
-这样直接中间人攻击或者服务端伪造更改 Geode 协议的 Data 为漏洞链1的 Payload 就行了，下面开始漏洞复现
+这样直接伪造一个服务端，在特定情况下更改 Geode 协议的 Data 为漏洞链1的 Payload 就行了，下面开始漏洞复现
 
 # [](#header-31)漏洞agvl-01:
 # [](#header-31)Apache Geode 客户端反序列化RCE漏洞(基于漏洞链2)
 
-接下来的大致流程是构造一个伪服务端，拦截发送到客户端的 TCP 流量后观察其 Data 头部是否为 015C04AC，若是，则将 Data 替换为漏洞链1的基于 CC7 链的 Payload  
+接下来的大致流程是构造一个伪服务端，截取发送到客户端的 Geode 协议流量后观察其 Data 开头是否为 015C04AC，若是，则将 Data 替换为漏洞链1的基于 CC7 链的 Payload  
 上面这段话看似简单，实际上要实现并非简单. 基于 TCP 协议的 Geode 协议并非类似于应用层 HTTP(s) 这种协议，想拦就拦想改就改. 按照以往流程，笔者需要在 Linux 服务器上写个 hook 函数直接拦截 TCP 流量并观察其内容  
 
 不过笔者又不想写 hook，只能找到了一个 Scapy + netfilterqueue 已经替用户封装好了的替代方案，通过 iptables 重定向流量导入 netfilterqueue 后再编写 Python 代码从 netfilterqueue 中抓取 TCP 流量
 
-首先在 Server 端安装 netfilterqueue 在 CentOS7 操作系统上的依赖，命令如下所示
+首先在伪服务端安装 netfilterqueue 在 CentOS7 操作系统上的依赖，命令如下所示
 
 ```bash
 yum install python3-devel
@@ -370,7 +374,7 @@ yum install libnfnetlink-devel
 yum install libnetfilter_queue-devel
 ```
 
-更改 iptables，如下所示. 请注意，这里一定要将机器接显或者使用云厂商 VNC 连接！
+更改伪服务端 iptables，如下所示. 请注意，这里一定要将机器接显或者使用云厂商 VNC 连接！
 
 ```bash
 #更改 iptables 配置
@@ -379,7 +383,7 @@ iptables -A INPUT -j NFQUEUE --queue-num 0
 iptables -A OUTPUT -j NFQUEUE --queue-num 0
 ```
 
-在使用 pip 安装完毕 netfilterqueue python 接口 package 后，运行以下代码
+在使用 pip 安装完毕 netfilterqueue python 接口 package 后，在伪服务端运行以下代码
 
 ```py
 #写 TCP 抓包改包 hook 并运行
@@ -418,7 +422,7 @@ queue.run()
 
 # [](#header-31)漏洞链 3:
 
-周末周日休息
+这周休息
 
 # [](#header-31)一些个人建议
 
@@ -432,4 +436,3 @@ queue.run()
 笔者对开发者的一些建议：  
 
 1. 希望 Apache Geode 在网络数据交互方面能有更多的优化和测试
-2. 如<!--果一个开发者只是对于软件架构有深入地理解，而对于网络编程几乎一窍不通，那我建议他千万千万别来搞 Web 开发，千万别来写中间件，自己开发的东西为什么没什么人用自己没有点b数吗？-->
