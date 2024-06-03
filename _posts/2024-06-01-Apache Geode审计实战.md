@@ -16,7 +16,7 @@ published: true
   <tr><td>
     AGVL-01: Apache Geode 客户端反序列化 RCE 漏洞
   </td><td>
-    由于客户端不正确地接收了来自服务端的数据流并将其误静态判断后反序列化，若攻击者伪造服务端/中间人攻击，将触发该反序列化漏洞并 RCE
+    由于客户端在连接服务端的 handshake 过程中接收了来自服务端的数据流但不正确地将其误静态处理后反序列化，若攻击者在此过程中伪造服务端/中间人攻击，将触发该反序列化漏洞并最终导致命令执行漏洞
   </td></tr>
 </table>
 <!--
@@ -84,7 +84,9 @@ public class CacheServerHelper {
 
 这几个重载都将数据引到 unzip 或 BlobHelper.deserializeBlob 中，虽然 unzip 在解压后直接能够触发反序列化，但该方法在源代码中不会被调用. 因此这里笔者直接跟进 BlobHelper.deserializeBlob 即 org.apache.geode.internal.util.BlobHelper.basicReadObject  
 
-中间调用路径只是在将数据类型转化来转化去，笔者认为有省略的必要  
+中间调用路径只是在将数据类型转化和简单逻辑处理，笔者认为有省略的必要，如果有需要学习的读者可以自行下来研究  
+
+![avatar](/image/2024-06-01-6.png)  
 
 中间调用路径省略，而后经过逐层调用后直接来到了 org.apache.geode.internal.InternalDataSerializer.basicReadObject，此时由用户输入而来的参数 in 的类型为 PdxInputStream 既继承了 InputStream 又实现了 DataInput
 
@@ -292,7 +294,6 @@ public class Main {
 ![avatar](/image/2024-06-01-5.png)  
 `*工厂create`
 
-
 接下来总结该数据的规律:  
 经过笔者多次反复重启 + Resume 观测后发现该流的 header 固定为 015C04AC ，且长度普遍在 80 - 100 的区间范围内.   
 接下来打开 WireShark 分析，多次运行并抓包看看是否能找到对应流量  
@@ -301,12 +302,61 @@ public class Main {
 
 ![avatar](/image/2024-06-01-3.png)  
 
-那这不就巧了吗，直接中间人攻击或者服务端伪造更改其内容为漏洞链1的 Payload 不就行了？
+而依据是什么？我们直接来到 org.apache.geode.cache.client.internal，观察 ConnectionConnector，关键在类型为 ConnectionImpl 的 connection 实例调用的 connect 方法，如下所示
+
+```java
+public class ConnectionConnector {
+    public ConnectionImpl connectClientToServer(ServerLocation location, boolean forQueue) throws IOException {
+        //初始化 connection
+        ConnectionImpl connection = null;
+        boolean initialized = false;
+
+        try {
+            //获取服务器连接
+            connection = this.getConnection(this.distributedSystem);
+            //准备客户端握手
+            ClientSideHandshake connHandShake = this.getClientSideHandshake(this.handshake);
+            //跟进 connetion.connect
+            connection.connect(this.endpointManager, location, connHandShake, this.socketBufferSize, this.handshakeTimeout, this.readTimeout, this.getCommMode(forQueue), this.gatewaySender, this.socketCreator, this.socketFactory);
+        }
+        ...[省略几百行代码]...
+    }
+}
+```
+
+connection.connect 中会调用 handshakeWithServer. 在多次握手后服务器将会发送 Member 至客户端，客户端在 readServerMember 方法中使用存在作为漏洞链1的一部分的反序列化函数直接读取 Member，是导致反序列化漏洞的直接原因
+
+```java
+public class ClientSideHandshakeImpl extends Handshake implements ClientSideHandshake {
+    public ServerQueueStatus handshakeWithServer(Connection conn, ServerLocation location, CommunicationMode communicationMode) throws IOException, AuthenticationRequiredException, AuthenticationFailedException, ServerRefusedConnectionException {...}
+}
+```
+
+```java
+public class ClientSideHandshakeImpl extends Handshake implements ClientSideHandshake {
+    private InternalDistributedMember readServerMember(DataInputStream p_dis) throws IOException {
+        //获取 InputStream 获取 byte[]
+        byte[] memberBytes = DataSerializer.readByteArray(p_dis);
+        KnownVersion v = StaticSerialization.getVersionForDataStreamOrNull(p_dis);
+        //Byte[] 对象化
+        ByteArrayDataInput dis = new ByteArrayDataInput(memberBytes, v);
+
+        try {
+            //DataSerilizer 读取 Server Member，进入漏洞链1
+            return (InternalDistributedMember)DataSerializer.readObject(dis);
+        }
+        ...[省略几百行代码]...
+            
+    }
+}
+```
+
+这样直接中间人攻击或者服务端伪造更改 Geode 协议的 Data 为漏洞链1的 Payload 就行了，下面开始漏洞复现
 
 # [](#header-31)漏洞agvl-01:
 # [](#header-31)Apache Geode 客户端反序列化RCE漏洞(基于漏洞链2)
 
-接下来笔者需要做的事情就是构造一个伪服务端，拦截发送到客户端的 TCP 流量后观察其 Data 头部是否为 015C04AC，若是，则将 Data 替换为漏洞链1的基于 CC7 链的 Payload  
+接下来的大致流程是构造一个伪服务端，拦截发送到客户端的 TCP 流量后观察其 Data 头部是否为 015C04AC，若是，则将 Data 替换为漏洞链1的基于 CC7 链的 Payload  
 上面这段话看似简单，实际上要实现并非简单. 基于 TCP 协议的 Geode 协议并非类似于应用层 HTTP(s) 这种协议，想拦就拦想改就改. 按照以往流程，笔者需要在 Linux 服务器上写个 hook 函数直接拦截 TCP 流量并观察其内容  
 
 不过笔者又不想写 hook，只能找到了一个 Scapy + netfilterqueue 已经替用户封装好了的替代方案，通过 iptables 重定向流量导入 netfilterqueue 后再编写 Python 代码从 netfilterqueue 中抓取 TCP 流量
