@@ -1,9 +1,9 @@
 ---
-title: Apache Geode审计现场实战 - 漏洞链构造/实时更新
+title: Apache Geode审计现场实战 - 漏洞链构造/完结归档
 published: true
 ---
 
-这段时间笔者审计在此之前遇到的一个 Apache 中间件 Apache Geode，并且会在这里实时开源自己新鲜审计出来的漏洞链 和 已经审计出来的 RCE 漏洞，供读者学习  
+这段时间笔者审计在此之前遇到的一个 Apache 中间件 Apache Geode，并且会在这里实时开源自己审计出来的 RCE 漏洞，供读者学习  
 
 注意，本篇文章不遵循 CC 协议，其内容均为 leeya_bug 所有，禁止转载
 
@@ -367,7 +367,7 @@ public class ClientSideHandshakeImpl extends Handshake implements ClientSideHand
 这样直接伪造一个服务端，在特定情况下更改 Geode 协议的 Data 为漏洞链1的 Payload 就行了，下面开始漏洞复现
 
 # [](#header-31)漏洞agvl-01:
-# [](#header-31)Apache Geode 反序列化 RCE 漏洞(基于漏洞链2)
+# [](#header-31)Apache Geode 反序列化 RCE 漏洞(基于漏洞链1、漏洞链2)
 
 接下来的大致流程是构造一个伪服务端，截取发送到工程端的 Geode 协议流量后观察其 Data 开头是否为 015C04AC，若是，则将 Data 替换为漏洞链1的基于 CC7 链的 Payload  
 上面这段话看似简单，实际上要实现并非简单. 基于 TCP 协议的 Geode 协议并非类似于应用层 HTTP(s) 这种协议，想拦就拦想改就改. 按照以往流程，笔者需要在 Linux 服务器上写个 hook 函数直接拦截 TCP 流量并观察其内容  
@@ -424,7 +424,7 @@ queue.run()
 # [](#header-31)漏洞链 3:
 # [](#header-31)构造恶意 JAR:
 
-接下来将利用集群能够上传 JAR 并解析其中的函数的特性，构造一个包含 RCE Payload 的 JAR 并在后续漏洞验证阶段上传. 首先读者可以阅读一下 Apache Geode 官方文档、笔者以下给出的 Youtube 视频示例，来初步了解下 Apache Geode 的集群函数部署方式及解析特性  
+笔者将利用集群能够上传 JAR 并解析其中的函数的特性，构造一个包含 RCE Payload 的 JAR 并在后续漏洞验证阶段上传. 首先读者可以阅读一下 Apache Geode 官方文档、笔者以下给出的 Youtube 视频示例，来初步了解下 Apache Geode 的集群函数部署方式及解析特性  
 
 [Geode官方文档 如何构建一个Geode函数并将其部署到集群中](https://geode.apache.org/docs/guide/114/configuring/cluster_config/deploying_application_jars.html)
 
@@ -546,7 +546,7 @@ git clone https://github.com/apache/geode-examples
 # [](#header-31)漏洞agvl-02:
 # [](#header-33)Apache Geode 集群未授权 RCE 漏洞(基于漏洞链3)
 
-现在 172.245.82.84 从加害者变成受害人了，我们将刚刚漏洞链3打包完毕的 JAR 部署到 12.245.82.84 中并调用该 JAR 中的恶意 Payload
+现在轮到 172.245.82.84 变成受害人了，我们将刚刚漏洞链3打包完毕的 JAR 部署到 12.245.82.84 中并调用该 JAR 中的恶意 Payload
 
 1. 接下来我们在客户端的 gfsh 终端中使用命令 `connect --locator=172.245.82.84[10334]` 连接 172.245.82.84
 
@@ -560,7 +560,7 @@ git clone https://github.com/apache/geode-examples
 
     在客户端上输入以上命令时，请完全忽略回显，由于一些集群底层架构问题，回显是错误的. 
 
-    命令解释:   
+    Tip1:   
     第 1、2 条命令的作用是创建一个可交互性 region，笔者打包的 functions.jar 需要名为 example-region 的 region 用作数据交互  
     第 3 条命令的作用是将 functions.jar 部署到集群中
 
@@ -594,3 +594,7 @@ git clone https://github.com/apache/geode-examples
 如果有人利用笔者的思路/漏洞链继续审出来RCE也没关系，这篇文章提到的漏洞链都是完全开放的，把洞卖了能分点钱给我就行(bushi).  
 
 总之如果有想部署复现、学习的读者可以联系笔者参考，有想拿去交 CVE 的就交吧就当笔者送你的
+
+-----
+
+于 2024 6 9日更新，笔者目标已经完成，后续如无必要将不会再对该资产做出进一步审计和处理
