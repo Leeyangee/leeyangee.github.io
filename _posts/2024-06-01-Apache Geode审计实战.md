@@ -24,7 +24,7 @@ published: true
         AGVL-02: Apache Geode 集群未授权 RCE 漏洞
     </td>
     <td>
-        由于集群可由任意工程端连接上传特定 JAR 并解析其中函数，攻击者可将 Payload 植入于 JAR 中，将在集群中触发命令执行漏洞
+        由于集群可由任意工程端、节点连接并上传特定 JAR 部署函数，攻击者可将 Payload 植入到 JAR 并上传至集群，而后调用该 JAR，在集群中触发命令执行漏洞
         &nbsp;
     </td>
   </tr>
@@ -423,8 +423,9 @@ queue.run()
 -->
 
 # [](#header-31)漏洞链 3:
+# [](#header-31)构造恶意 JAR:
 
-接下来将利用集群能够上传 JAR 并解析其中的函数的特性，构造 RCE，首先读者可以阅读一下 Apache Geode 官方文档、笔者以下给出的 Youtube 视频示例，来初步了解下 Apache Geode 的集群函数部署方式及解析特性  
+接下来将利用集群能够上传 JAR 并解析其中的函数的特性，构造一个包含 RCE Payload 的 JAR 并在后续漏洞验证阶段上传. 首先读者可以阅读一下 Apache Geode 官方文档、笔者以下给出的 Youtube 视频示例，来初步了解下 Apache Geode 的集群函数部署方式及解析特性  
 
 [Deploying Application JARs to Apache Geode Members](https://geode.apache.org/docs/guide/114/configuring/cluster_config/deploying_application_jars.html)
 
@@ -493,16 +494,17 @@ git clone https://github.com/apache/geode-examples
 2. 而后，修改 `Example.java` 中的第 35 行的 IP 地址为远程集群 IP: 172.245.82.84 (这里是我个人 IP，读者请按自己需要修改)
     ![avatar](/image/2024-06-01-12.png)  
 
-3. 植入完毕后，进入`geode-examples/functions`，输入以下命令启动 gralew 打包:  
+3. 植入完毕后，进入`geode-examples/functions`，输入以下命令启动 gralew 打包(请注意，在此处 jdk1.8 环境是必要的，请先安装 jdk1.8 再执行以下步骤):  
     `../gradlew build`  
-    若提示格式错误，请使用命令 `../gradlew spotlessApply` 来重整格式
+    若提示格式错误，请使用命令 `../gradlew spotlessApply` 来重整格式  
+    
 
 4. 打包完毕后，文件 `geode-examples/functions/build/libs/functions.jar` 即为我们即将植入集群的恶意类 JAR
 
 # [](#header-31)漏洞agvl-02:
-# [](#header-31)Apache Geode 集群未授权 RCE 漏洞(基于漏洞链3)
+# [](#header-33)Apache Geode 集群未授权 RCE 漏洞(基于漏洞链3)
 
-现在 172.245.82.84 从加害者变成受害人了，我们将刚刚打包完毕的 JAR 部署到 12.245.82.84 中并调用该 JAR 中的恶意 Payload
+现在 172.245.82.84 从加害者变成受害人了，我们将刚刚漏洞链3打包完毕的 JAR 部署到 12.245.82.84 中并调用该 JAR 中的恶意 Payload
 
 1. 接下来我们在客户端使用命令 `connect --locator=172.245.82.84[10334]` 连接 172.245.82.84
 
@@ -516,6 +518,10 @@ git clone https://github.com/apache/geode-examples
 
     在客户端上输入以上命令时，请完全忽略回显，回显是错误的. 
 
+    命令解释:   
+    第 1、2 条命令的作用是创建一个可交互性 region，笔者打包的 functions.jar 需要名为 example-region 的 region 用作数据交互  
+    第 3 条命令的作用是将 functions.jar 部署到集群中
+
 2. 进入 `geode-examples/functions`，输入以下命令启动客户端调用远程函数  
 
     `../gradlew run`
@@ -524,7 +530,7 @@ git clone https://github.com/apache/geode-examples
 
     ![avatar](/image/2024-06-01-9.png)  
 
-3. 登录集群，发现根目录 `/` 下果然存在文件 `/hacked.txt`，证明攻击者可将 Payload 植入于 JAR 中，将在集群中触发命令执行漏洞  
+3. 登录集群，发现根目录 `/` 下果然存在文件 `/hacked.txt`，证明攻击者可将 Payload 植入到 JAR 并上传至集群，而后调用该 JAR，在集群中触发命令执行漏洞  
 
     ![avatar](/image/2024-06-01-11.png)  
 
