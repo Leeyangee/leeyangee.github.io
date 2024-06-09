@@ -71,7 +71,6 @@ Apache Geode 的官方仓库：[https://github.com/apache/geode](https://github.
 在漏洞构造过程，笔者将会省略一些无关紧要的内容，尽量简述. 更多细节请读者私下自行测试
 
 # [](#header-31)漏洞链 1:
-# [](#header-31)CacheServerHelper.deserialize(Args)
 
 笔者注意到 org.apache.geode.internal.cache.tier.sockets.CacheServerHelper 被该中间件广泛使用在 client 和 server 的 Cache 交互中的处理文件或对象反序列化场景，而该对象关键三个方法如下所示  
 
@@ -255,7 +254,6 @@ public class Geode {
 ```
 
 # [](#header-31)漏洞链 2:
-# [](#header-31)基于漏洞链1直达用户 interface
 
 在漏洞链2的构造过程中需要连接服务器并动态调试，因此笔者使用了IP为 172.245.82.84 的笔者合法购买的服务器，谁想打谁打吧反正就一个22端口
 
@@ -422,7 +420,6 @@ queue.run()
 -->
 
 # [](#header-31)漏洞链 3:
-# [](#header-31)构造恶意 JAR:
 
 笔者将利用集群能够上传 JAR 并解析其中的函数的特性，构造一个包含 RCE Payload 的 JAR 并在后续漏洞验证阶段上传. 首先读者可以阅读一下 Apache Geode 官方文档、笔者以下给出的 Youtube 视频示例，来初步了解下 Apache Geode 的集群函数部署方式及解析特性  
 
