@@ -7,9 +7,9 @@ published: true
 
 如果有人利用笔者的思路/漏洞链继续审出来RCE也没关系，这篇文章提到的漏洞链都是完全开放的，把洞卖了能分点钱给我就行(bushi).  
 
-注意，本篇文章不遵循 CC4 协议，其内容均为 leeya_bug 所有，禁止转载
+注意，本篇文章不遵循 CC 协议，其内容均为 leeya_bug 所有，禁止转载
 
-<table style="border:1px solid #2bbc8a;border-collapse: collapse" border="1">
+<table style="border:1px solid #2bbc8a;border-collapse: collapse;" border="1">
   <tr><td colspan="2">
     当前由 leeya_bug 发现的 Apache Geode 漏洞
   </td></tr>
@@ -18,14 +18,15 @@ published: true
         AGVL-01: Apache Geode 反序列化 RCE 漏洞
     </td>
     <td>
-        工程端、节点在初始化(handshake)时接收了来自服务端的数据流但不正确地将其处理，若攻击者在此过程中伪造服务端/中间人攻击，将触发反序列化漏洞并最终导致命令执行漏洞
+        由于客户端、节点在初始化 Handshake 时接收了来自集群的数据流但不正确地将其处理，攻击者可在此过程中伪造集群/中间人攻击，将在客户端触发反序列化漏洞并最终导致命令执行漏洞
     </td>
   </tr>
   <tr>
     <td>
-        AGVL-02: Apache Geode 服务端提权 漏洞
+        AGVL-02: Apache Geode 集群未授权 RCE 漏洞
     </td>
     <td>
+        由于集群可由任意工程端连接上传特定 JAR 并解析其中函数，攻击者可将 Payload 植入于 JAR 中，将在集群中触发命令执行漏洞
         &nbsp;
     </td>
   </tr>
@@ -57,8 +58,9 @@ published: true
 |--------|
 | [漏洞链 1: CacheServerHelper.deserialize(Args)](#漏洞链-1) |
 | [漏洞链 2: 基于漏洞链1直达用户 interface](#漏洞链-2) |
-| [AGVL-01漏洞: Apache Geode 客户端反序列化RCE漏洞(基于漏洞链2)](#漏洞agvl-01) |
-| [漏洞链 3: ](#漏洞链-3) |
+| [AGVL-01漏洞: Apache Geode 反序列化 RCE 漏洞(基于漏洞链2)](#漏洞agvl-01) |
+| [漏洞链 3: 构造恶意 JAR ](#漏洞链-3) |
+| [AGVL-02漏洞: Apache Geode 集群未授权提取 RCE 漏洞(基于漏洞链3)](#漏洞agvl-02) |
 | [一些个人建议](#一些个人建议) |
 
 # [](#header-31)Apache Geode介绍
@@ -263,12 +265,12 @@ public class Geode {
 在 172.245.82.84 装上 jdk1.8 运行 gfsh 命令终端后，输入以下几行命令 bind ip 并启动 Geode 服务端并且初始化 locator、server、region
 
 ```bash
-start locator --bind-address=172.245.82.84
-start server --bind-address=172.245.82.84
+start locator --bind-address=172.245.82.84 --name=locator_1
+start server --bind-address=172.245.82.84 --name=server_1
 create region --name=hello --type=REPLICATE_PERSISTENT
 ```
 
-接下来在客户端中构造连接服务端的 java 代码，如下代码所示
+接下来在工程端中构造连接服务端的 java 代码，如下代码所示
 
 ```java
 import org.apache.geode.cache.Region;
@@ -291,7 +293,7 @@ public class Main {
 
 在与服务端建立连接前，启动 Wireshark 来监测流量. 由于该流量为基于 TCP 的自建协议(以下简称 "Geode 协议")，笔者直接过滤掉其他非 Geode 协议数据然后输入过滤语句`ip.dst == 172.245.82.84 || ip.src == 172.245.82.84`(172.245.82.84 是笔者本人服务端IP)开始监测应用流量
 
-而后运行代码，观测先前笔者在漏洞链1中提到的 InternalDataSerializer.basicReadObject 中的栈变量，在第一次客户端与服务端通信并调用 InternalDataSerializer.basicReadObject 时，我们会发现如下所示 in 中的 bytearr 值全为0. 不过先别急，这应该是 buffer 预留信息
+而后运行代码，观测先前笔者在漏洞链1中提到的 InternalDataSerializer.basicReadObject 中的栈变量，在第一次工程端与服务端通信并调用 InternalDataSerializer.basicReadObject 时，我们会发现如下所示 in 中的 bytearr 值全为0. 不过先别急，这应该是 buffer 预留信息
 
 ![avatar](/image/2024-06-01-1.png)  
 
@@ -326,7 +328,7 @@ public class ConnectionConnector {
         try {
             //获取服务器连接
             connection = this.getConnection(this.distributedSystem);
-            //准备客户端握手
+            //准备握手
             ClientSideHandshake connHandShake = this.getClientSideHandshake(this.handshake);
             //跟进 connetion.connect
             connection.connect(this.endpointManager, location, connHandShake, this.socketBufferSize, this.handshakeTimeout, this.readTimeout, this.getCommMode(forQueue), this.gatewaySender, this.socketCreator, this.socketFactory);
@@ -336,7 +338,7 @@ public class ConnectionConnector {
 }
 ```
 
-connection.connect 中会调用 handshakeWithServer. 在多次握手后服务器将会发送 Member 至客户端，客户端在 readServerMember 方法中使用存在作为漏洞链1的一部分的反序列化函数直接读取 Member，是导致反序列化漏洞的直接原因
+connection.connect 中会调用 handshakeWithServer. 在多次握手后服务器将会发送 Member 至工程端，工程端在 readServerMember 方法中使用存在作为漏洞链1的一部分的反序列化函数直接读取 Member，是导致反序列化漏洞的直接原因
 
 ```java
 //源码分析
@@ -368,9 +370,9 @@ public class ClientSideHandshakeImpl extends Handshake implements ClientSideHand
 这样直接伪造一个服务端，在特定情况下更改 Geode 协议的 Data 为漏洞链1的 Payload 就行了，下面开始漏洞复现
 
 # [](#header-31)漏洞agvl-01:
-# [](#header-31)Apache Geode 客户端反序列化RCE漏洞(基于漏洞链2)
+# [](#header-31)Apache Geode 反序列化 RCE 漏洞(基于漏洞链2)
 
-接下来的大致流程是构造一个伪服务端，截取发送到客户端的 Geode 协议流量后观察其 Data 开头是否为 015C04AC，若是，则将 Data 替换为漏洞链1的基于 CC7 链的 Payload  
+接下来的大致流程是构造一个伪服务端，截取发送到工程端的 Geode 协议流量后观察其 Data 开头是否为 015C04AC，若是，则将 Data 替换为漏洞链1的基于 CC7 链的 Payload  
 上面这段话看似简单，实际上要实现并非简单. 基于 TCP 协议的 Geode 协议并非类似于应用层 HTTP(s) 这种协议，想拦就拦想改就改. 按照以往流程，笔者需要在 Linux 服务器上写个 hook 函数直接拦截 TCP 流量并观察其内容  
 
 不过笔者又不想写 hook，只能找到了一个 Scapy + netfilterqueue 已经替用户封装好了的替代方案，通过 iptables 重定向流量导入 netfilterqueue 后再编写 Python 代码从 netfilterqueue 中抓取 TCP 流量
@@ -414,17 +416,9 @@ queue.run()
 ```
 
 在所有的一切配置完毕后，我们的伪服务端就已经构造完毕了.  
-接下来运行客户端连接 172.245.82.84 时直接弹计算器出来，证明此处存在命令执行漏洞  
+接下来运行工程端连接 172.245.82.84 时直接弹计算器出来，证明此处存在命令执行漏洞  
 
 ![avatar](/image/2024-06-01-4.png)  
-
-该漏洞笔者还未提交至任何漏洞平台，仅在此公开，原因如下：
-
-1. Apache Geode 部署流程、伪服务器构造过程都比较棘手，搞坏了我两台服务器真机(不包括 docker)的配置环境
-2. 鉴于复现过程中受到远程/本地缓存的影响，客户端多次向服务端获取缓存后，很可能就不获取了，也就无法触发该漏洞
-3. 笔者学业繁忙，如果想要达到 100% 复现率，需要花半把个月时间将整个 Geode 协议吃透，而本篇文章仅为学习用途，因此无任何深入研究  Geode 协议并将其利益化的必要
-
-总之如果有想部署复现、学习的读者可以联系笔者参考，有想拿去交 CVE 的就交吧就当笔者送你的
 
 <!--
 至于为什么该漏洞编号为 AGVL-01 呢？是因为 AGVL 是 Apache Geode Vulnerability by leeya_bug 的简称
@@ -432,17 +426,34 @@ queue.run()
 
 # [](#header-31)漏洞链 3:
 
-这周休息
+我们将利用集群能够上传 JAR 并解析其中的函数的特性，构造 RCE
+
+(后面再更新)
+
+# [](#header-31)漏洞agvl-02:
+# [](#header-31)Apache Geode 集群未授权 RCE 漏洞(基于漏洞链3)
+
+这下我们的受害机器是 172.245.82.84 了，接下来我们
+
+(后面再更新)
 
 # [](#header-31)一些个人建议
 
 在Apache Geode中，有那么一些小特性：
 
 1. Apache Geode 创建的 server、locator 绑定的IP必须与用户在同一子网下，使用穿透、端口映射等方法均完全无法正常访问，同理对于 docker 镜像部署几乎属于 0 支持
-2. 官方文档缺斤少两：无论是中文的文档还是英文的文档，都是缺斤少两. 很多函数调用细节都是笔者猜想出来的
-3. 对于个人用户的支持性极差：几乎只适合企业级场景
-4. 错误处理极为奇葩：笔者在动态调试过程中只收到过一类正确的 Exception，当然是笔者自己忘记 docker 映射端口的原因，后续收到的 Exceptions 几乎都是无脑 throw 底部栈
+2. 官方文档缺斤少两：无论是中文的文档还是英文的文档，都是缺斤少两. 很多函数调用细节都是笔者猜想出来的，尤其是在 jmx 访问处，笔者
+3. 稳定性极差：
+4. 对于个人用户的支持性极差：几乎只适合企业级场景
+5. 错误处理极为奇葩：笔者在动态调试过程中只收到过一类正确的 Exception，当然是笔者自己忘记 docker 映射端口的原因，后续收到的 Exceptions 几乎都是无脑 throw 底部栈
 
 笔者对开发者的一些建议：  
 
 1. 希望 Apache Geode 在网络数据交互方面能有更多的优化和测试
+
+以上漏洞笔者还未提交至任何漏洞平台，仅在此公开，原因如下：
+
+1. Apache Geode 部署流程较为棘手，搞坏了我两台服务器真机(不包括 docker)的配置环境
+2. 笔者学业繁忙，如果想要达到 100% 复现率，需要花半把个月时间将整个 Geode 协议吃透，而本篇文章仅为学习用途，因此无任何深入研究  Geode 协议并将其利益化的必要
+
+总之如果有想部署复现、学习的读者可以联系笔者参考，有想拿去交 CVE 的就交吧就当笔者送你的
