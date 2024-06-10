@@ -436,11 +436,11 @@ queue.run()
 ```java
 //by leeya_bug
 public class TestFunction implements Function {
-  public static final String ID = "test123";
+  public static final String ID = "leeya_bug_TestFunction";
 
   @Override
   public String getId() {
-    return "leeya_bug"
+    return this.ID;
   }
 
   @Override
