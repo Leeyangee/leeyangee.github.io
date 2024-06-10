@@ -435,14 +435,16 @@ queue.run()
 
 ```java
 //by leeya_bug
+import org.apache.geode.cache.execute.Function;
+
 public class TestFunction implements Function {
   public static final String ID = "leeya_bug_TestFunction";
-
+  //必须 Override getId 函数，getId 返回的 ID 为该函数类唯一标识符
   @Override
   public String getId() {
-    return this.ID;
+    return ID;
   }
-
+  //函数类的入口
   @Override
   public void execute(FunctionContext context) {
 
@@ -598,15 +600,16 @@ git clone https://github.com/apache/geode-examples
         @Override
         public void execute(FunctionContext context) {
             try {
+                //获取客户端传参，并将执行结果转为 BufferReader
                 Object[] args = (Object[]) context.getArguments();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(Runtime.getRuntime().exec((String) args[0]).getInputStream()));
-
+                //获取命令执行结果
                 String line;
                 StringBuilder output = new StringBuilder();
                 while ((line = reader.readLine()) != null) {
                     output.append(line).append("\n");
                 }
-
+                //返回命令执行结果
                 context.getResultSender().lastResult(output.toString());
             }catch (Exception e){
                 context.getResultSender().lastResult(e.getMessage());
@@ -615,7 +618,7 @@ git clone https://github.com/apache/geode-examples
 
         @Override
         public String getId() {
-            return this.ID;
+            return ID;
         }
     }
     ```
@@ -630,12 +633,13 @@ git clone https://github.com/apache/geode-examples
 
     public class Client {
         public static void main(String[] args)() {
+            //连接集群服务器
             ClientCache cache = new ClientCacheFactory().addPoolLocator("172.245.82.84", 10334).create();
-
+            //客户端传参
             Object[] functionArgs = new Object[]{"cat /etc/passwd"};
             Execution execution = FunctionService.onServer(cache).setArguments(functionArgs);
             ResultCollector<?, ?> rc = execution.execute("leeyabug_example");
-
+            //获取执行结果并打印
             Object result = rc.getResult();
             System.out.println(result);
             cache.close();
