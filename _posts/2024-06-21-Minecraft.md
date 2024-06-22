@@ -1,6 +1,7 @@
 ---
-title: &lt;游戏向&gt;在Minecraft建数据中心 - 基于CC mod的Dos编程
+title: (游戏向)在Minecraft建数据中心 - 基于CC mod的Dos编程
 published: true
 ---
 
 暂无内容
+&lt;游戏向&gt;
