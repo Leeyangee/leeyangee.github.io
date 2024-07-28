@@ -1,0 +1,309 @@
+/*
+   original: https://github.com/pages-themes/hacker 
+*/
+
+@import "rouge-base16-dark";
+@import "default_colors";
+
+$body-background: $cod-grey !default;
+$body-foreground: $gallery !default;
+$header: $conifer !default;
+$blockquote-color: $silver-chalice !default;
+$blockquote-border: $dove-grey !default;
+
+@font-face {
+  font-style: normal;
+  font-family: "Meslo LG";
+  font-display: swap;
+  src: url("https://leeyabug-top-1309475701.cos-website.ap-nanjing.myqcloud.com/MesloLGS-Regular.ttf") format("truetype"),
+    url("/assets/MesloLGS-Regular.ttf") format("truetype");
+}
+
+.leeya_good {
+  background:
+  url("https://leeyabug-top-1309475701.cos-website.ap-nanjing.myqcloud.com/face.jpg") no-repeat,
+  url("data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAFA3PEY8MlBGQUZaVVBfeMiCeG5uePWvuZHI////////////////////////////////////////////////////2wBDAVVaWnhpeOuCguv/////////////////////////////////////////////////////////////////////////wAARCACyAZADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwCrRQaKAFopM0daAFooNA60AJSd6XtQOtABRR2ooAcmd4x1q0AT0FVo8CVSema0enSi4mrkIQ4oMZqbNIWA70rhyohKEUBSak8wUnmCndhZDNvvSbT6U/zBR5o9KLsLIRVNO203zDSb6Wo1YkxS1Fvpd9A7okoxmmbqcGoACoPamECpKMA9qLisQsOaYSB1qzgelVbjG7GKq5LiLiipgikA4601kx0p3FykdFOxTaZNgooooEFFFFAwpCfmA9Af5GnUij/SMHuMUmVHcj+9t57f403tT5Btxjjg/wAzUfvUlEsf3adTY/u0+qRm9xKKKKYgooxS0h2DFFFFBVgpsbZb2pWOFqL/AJYD60mNIj70maXNJikU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") no-repeat;
+  background-size:cover;
+   filter: brightness(0.7);
+}
+
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #000000;//url("../assets/bkg.png") 0 0;
+  color: $body-foreground;
+  font-size: 16px;
+  line-height: 1.5;
+  /*font-family: Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal, monospace;*/
+  /*font-family: "Gill Sans", sans-serif*/
+   font-family:  "Meslo LG", sans-serif;
+}
+
+/* General & 'Reset' Stuff */
+
+.container {
+  width: 70%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+
+section {
+  display: block;
+  margin: 0 0 20px 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 20px;
+}
+
+li {
+  line-height: 1.4 ;
+}
+
+li::marker{
+   color: #2bbc8a;
+}
+
+/* Header, <header>
+   header   - container
+   h1       - project name
+   h2       - project description
+*/
+
+header {
+  background: rgba(0, 0, 0, 0.1);
+  border-bottom: 1px dashed $conifer; //header;
+  padding: 20px;
+  margin: 0 0 40px 0;
+}
+
+.header-links {
+  text-align: center;
+}
+
+.header-link {
+  display: inline;
+}
+
+header h1 {
+  font-size: 24px;
+  line-height: 1.5;
+  margin: 0;
+  text-align: center;
+  font-weight: bold;
+  font-family:  "Meslo LG", sans-serif;
+  color: #2bbc8a;//$header;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1),
+               0 0 5px rgba(43, 188, 138, 0.1),
+               0 0 10px rgba(43, 188, 138, 0.1);
+  letter-spacing: -1px;
+  -webkit-font-smoothing: antialiased;
+   
+}
+
+header h2 {
+  font-size: 18px;
+  /*font-weight: 300;*/
+  color: #2bbc8a;
+   text-shadow: 0 0 6px #000, 0 0 6px #000, 0 0 6px #000, 0 0 6px #000;
+}
+
+/* Main Content
+*/
+
+#main_content {
+  width: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+section img {
+  max-width: 100%
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: normal;
+  font-family:  "Meslo LG", sans-serif;
+  color: $header;
+  letter-spacing: -0.03em;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1),
+               0 0 5px rgba(43, 188, 138, 0.1),
+               0 0 10px rgba(43, 188, 138, 0.1);
+}
+
+#main_content h1 {
+  font-size: 30px;
+}
+
+#main_content h2 {
+  font-size: 22px;
+}
+
+#main_content h3 {
+  font-size: 18px;
+}
+
+#main_content h4 {
+  font-size: 14px;
+}
+
+#main_content h5 {
+  font-size: 12px;
+  text-transform: uppercase;
+  margin: 0 0 5px 0;
+}
+
+#main_content h6 {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #999;
+  margin: 0 0 5px 0;
+}
+
+dt {
+  font-weight: bold;
+}
+
+ul li {
+   list-style-type: '# '
+  //list-style-image:url('../assets/bullet.png');
+}
+
+blockquote {
+  color: $blockquote-color;
+  padding-left: 10px;
+  border-left: 1px dotted $blockquote-border;
+}
+
+pre {
+  background: rgba(0, 0, 0, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 10px;
+  font-size: 16px;
+  color: #2bbc8a;
+  border-radius: 2px;
+  text-wrap: normal;
+  overflow: auto;
+  overflow-y: hidden;
+}
+
+code.highlighter-rouge {
+  background: rgba(0,0,0,0.9);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 0px 3px;
+  margin: 0px -3px;
+  color: #aa759f;
+  border-radius: 2px;
+}
+
+table {
+  width: 100%;
+  margin: 0 0 20px 0;
+}
+
+th {
+  text-align: left;
+  border-bottom: 1px dashed #2bbc8a;
+  padding: 5px 10px;
+}
+
+td {
+  padding: 5px 10px;
+}
+
+hr {
+  height: 0;
+  border: 0;
+  border-bottom: 1px dashed #2bbc8a;
+  color: #2bbc8a;
+}
+
+/* Buttons
+*/
+
+.btn {
+  display: inline-block;
+  background: -webkit-linear-gradient(top, rgba(40, 40, 40, 0.3), rgba(35, 35, 35, 0.3) 50%, rgba(10, 10, 10, 0.3) 50%, rgba(0, 0, 0, 0.3));
+  padding: 8px 18px;
+  border-radius: 50px;
+  border: 2px solid rgba(0, 0, 0, 0.7);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.7);
+  border-top: 2px solid rgba(0, 0, 0, 1);
+  color: rgba(255, 255, 255, 0.8);
+  font-family:  "Meslo LG", sans-serif;
+  font-weight: bold;
+  font-size: 13px;
+  text-decoration: none;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.75);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.btn:hover {
+  background: -webkit-linear-gradient(top, rgba(40, 40, 40, 0.6), rgba(35, 35, 35, 0.6) 50%, rgba(10, 10, 10, 0.8) 50%, rgba(0, 0, 0, 0.8));
+}
+
+.btn .icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin: 1px 8px 0 0;
+  float: left;
+}
+
+.btn-github .icon {
+  opacity: 0.6;
+  background: url("../images/blacktocat.png") 0 0 no-repeat;
+}
+
+/* Links
+   a, a:hover, a:visited
+*/
+
+a {
+   text-decoration: none;
+  color: #63c0f5;
+  text-shadow: 0 0 5px rgba(104, 182, 255, 0.5);
+}
+
+a:active, a:focus {
+  outline: 0;
+  border: none;
+  -moz-outline-style: none
+}
+
+/* Clearfix */
+
+.cf:before, .cf:after {
+  content:"";
+  display:table;
+}
+
+.cf:after {
+  clear:both;
+}
+
+.cf {
+  zoom:1;
+}
+
+/* Make footer stick to bottom */
+
+.pagination, footer {
+  height: 50px;
+  line-height: 50px;
+  text-align: center;
+}
+
+#wrapper {
+  min-height: calc(100vh - 100px);
+}
+
+.foot-tr{
+   border: 1px solid #000000;
+}
+
+.foot-a{
+   text-decoration: underline;
+   color: #077857;
+}
+

@@ -1,0 +1,32 @@
+title: leeya_bug的记录 - 赛博安全研究 - CyberSecurity Learn And Research
+description: "记录"
+author:
+  name: "leeya_bug"
+  email: "leeyang928320@gmail.com"
+  url: "https://ashishchaudhary.in/hacker-blog"
+
+baseurl: /
+
+source: .
+destination: ./_site
+permalink: /:title
+paginate: 20
+paginate_path: /page/:num/
+
+defaults:
+  -
+    scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+
+future: true
+plugins:
+  - jekyll-seo-tag
+  - jekyll-paginate
+  - jekyll-sitemap
+
+# Custom variables
+owner : "leeya_bug"
+year : "2021"
