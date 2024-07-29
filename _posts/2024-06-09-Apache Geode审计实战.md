@@ -9,6 +9,7 @@ published: true
 
 注意，本篇文章不遵循 CC 协议，其内容均为 leeya_bug 所有，禁止转载
 
+<br>
 <table style="border:1px solid #2bbc8a;border-collapse: collapse;" border="1">
   <tr><td colspan="3">
     当前由 leeya_bug 发现的 Apache Geode 漏洞
@@ -63,10 +64,10 @@ published: true
 | 目录跳转 |
 |--------|
 | [Apache Geode简介及背景介绍](#中间件简介及背景介绍) |
-| [漏洞链 1: CacheServerHelper.deserialize(Args)](#漏洞链-1) |
-| [漏洞链 2: 基于漏洞链1直达用户 interface](#漏洞链-2) |
+| [Sink-1: CacheServerHelper.deserialize(Args)](#sink-1) |
+| [Source-1: 基于漏洞链1直达用户 interface](#source-1) |
 | [AGVL-01漏洞: Apache Geode 反序列化 RCE 漏洞(基于漏洞链1、漏洞链2)](#漏洞agvl-01) |
-| [漏洞链 3: 构造恶意 JAR ](#漏洞链-3) |
+| [Source-2: 构造恶意 JAR ](#source-2) |
 | [AGVL-02漏洞: Apache Geode 集群未授权 RCE 漏洞(基于漏洞链3)](#漏洞agvl-02) |
 | [一些个人意见](#一些个人意见) |
 
@@ -79,7 +80,7 @@ Apache Geode 的官方仓库：[https://github.com/apache/geode](https://github.
 
 在漏洞构造过程，笔者将会省略一些无关紧要的内容，尽量简述，更多细节请读者私下自行测试. 另外，笔者将会以调用链(以下称漏洞链)的形式分步拆解漏洞调用路径，更便于分析
 
-# [](#header-31)漏洞链 1:
+# [](#header-31)sink-1:
 
 笔者注意到 org.apache.geode.internal.cache.tier.sockets.CacheServerHelper 被该中间件广泛使用在 client 和 server 的 Cache 交互中的处理文件或对象反序列化场景，而该对象关键三个方法如下所示  
 
@@ -262,7 +263,7 @@ public class Geode {
 }
 ```
 
-# [](#header-31)漏洞链 2:
+# [](#header-31)source-1:
 
 在漏洞链2的构造过程中需要连接服务器并动态调试，因此笔者使用了IP为 172.245.82.84 的笔者合法购买的服务器，谁想打谁打吧反正就一个22端口
 
@@ -429,7 +430,7 @@ queue.run()
 至于为什么该漏洞编号为 AGVL-01 呢？是因为 AGVL 是 Apache Geode Vulnerability by leeya_bug 的简称
 -->
 
-# [](#header-31)漏洞链 3:
+# [](#header-31)source-2:
 
 笔者将利用集群能够上传 JAR 并解析其中的函数的特性，构造一个包含 RCE Payload 的 JAR 并在后续漏洞验证阶段上传. 首先读者可以阅读一下 Apache Geode 官方文档、笔者以下给出的 Youtube 视频示例，来初步了解下 Apache Geode 的集群函数部署方式及解析特性  
 
