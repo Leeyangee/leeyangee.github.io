@@ -1,0 +1,67 @@
+<header id="bgcdn" class="leeya_good" >
+  <div style="margin-top:30vh;margin-bottom:15vh;filter: brightness(1.4);">
+    <a style="text-decoration: none;" href="{{ "/" | prepend: site.baseurl | replace: '//', '/' }}">
+      <h1 id="showtag" style="font-size: 28px;text-shadow: 0 0 6px #000, 0 0 6px #000, 0 0 6px #000, 0 0 6px #000;">
+        Hello,World!
+      </h1>
+    </a>
+    <script>
+            function ImageCDN(){
+              console.log(document.getElementById("bgcdn").style.background)
+            }
+            var words = [
+              "Hello,World!",
+              "你好,世界!",
+              "こんにちは,世界!",
+              "안녕,세상!",
+              "Hallo,Welt!",
+              "Saluton,mondo!",
+              "Здравствыйте!"
+            ];
+      
+            async function rollingWords(){
+                  var TIME = 60;
+                  while(1){
+                    for(var j = 0;j < words.length; j ++){
+                        showAdd = words[j];
+                        for(var i = 0;i <= showAdd.length; i ++){
+                            document.getElementById("showtag").innerHTML = showAdd.substr(0,i) + "&nbsp;";
+                            await sleep(TIME);
+                        }
+                        await sleep(2000);
+                        for(var i = showAdd.length; i >= 0; i --){
+                            document.getElementById("showtag").innerHTML = showAdd.substr(0,i) + "&nbsp;";
+                            await sleep(TIME);
+                        }
+                    }
+                  }
+            }
+            
+            function getRequest(){
+                rollingWords();
+            }
+            
+            function sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+            
+            
+            function check(){
+                try{
+                    ImageCDN();
+                    getRequest();
+                }catch(error){ }
+            }
+            
+            check()
+    </script>
+    <a style="text-decoration: none;font-size: 28px;" href="{{ "/" | prepend: site.baseurl | replace: '//', '/' }}">
+    {% assign owner_first_name = site.owner | split: " " %}
+    <h1 style="font-size: 28px;text-shadow: 0 0 6px #000, 0 0 6px #000, 0 0 6px #000, 0 0 6px #000;">{{ owner_first_name[0] | downcase }}@home:~$</h1>
+    <h1 style="font-size: 22px; color: #2bbc8a;text-shadow: 0 0 6px #000, 0 0 6px #000, 0 0 6px #000, 0 0 6px #000;">一个Coder,Attacker,Creator</h1>
+    </a>
+    <div class="header-links">
+      {% include links.html %}
+    </div>
+  </div>
+</header>
