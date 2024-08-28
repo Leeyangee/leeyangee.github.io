@@ -18,6 +18,12 @@ Exploitation Method: Remote
 
 There is a StackOverflow vulnerability in the QTS 5.1.8.2823. When an attacker has a low privilege account of the system, the attacker could upload a qdff and mount it, then call "unmount_qdff" and use some specific methods and parameters to cause a StackOverflow vulnerability
 
+## [](#header-3)THANKS:
+
+Special thanks to the TS-212P3 device provided by the NSFOCUS GeWu IoT Security Lab , and the QTS operating system firmware reverse analysis method on the public forum, which enabled me to discover this vulnerability.
+
+![/image/resources/1.png](/image/resources/qts_8.jpg)
+
 ## [](#header-3)AUDIT:
 
 There are several functions mentioned below. Let me first explain their uses:  
@@ -45,12 +51,18 @@ You must mount a qdff folder at first, if the name of mounted qdff folder is "as
 
 In a brief word, if there is a mounted qdff folder named "xxx", you can add any number of '/' in the header of parameter "share" to bypass detection, and the QTS system will mistakenly judge that "//////////////////xxx" is "xxx"
 
+In other words, since the check function only checks whether "asdf\x00" or a string like "////asdf//////" is in the value of the share parameter, it gives us an opportunity to exploit
+
+![/image/resources/1.png](/image/resources/qts_8.png)
+
 Finally execute sprintf and successfully StackOverflow(If you add enough '/', 100000 or 200000, So that it is enough to write the return address of the main running function)
 
 ![/image/resources/1.png](/image/resources/qts_2.png)
 ![/image/resources/1.png](/image/resources/qts_3.png)
 
-![/image/resources/1.png](/image/resources/qts_6.png)
+Here parameters are formatted into a string by using the sprintf function.
+
+![/image/resources/1.png](/image/resources/qts_9.png)
 
 
 The premise of all the above operations is that the qdff has been mounted, because in sub_BE8B4 or Delete_QDFF_Share, they will always check whether the qdff is mounted.
