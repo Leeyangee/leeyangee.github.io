@@ -3,17 +3,18 @@ title: Security Research of QTS 5.1 - Low-Authed StackOverflow
 published: true
 ---
 
-就在这周笔者发现了 QNAP NAS QTS 操作系统的一处低权限用户的 StackOverflow 漏洞，该情况已经汇报给厂商 SRC 并且大范围修复
+就在这周笔者发现了 QTS 操作系统远程控制面板一处低权限用户的 StackOverflow 漏洞，该情况已经汇报给 QNAP 厂商 SRC 并且大范围修复
 
-这个地方不出意外还有其他利用方式和利用链，如果有想了解分析该漏洞进一步细节的请联系笔者交流
+这个地方不出意外还有其他利用方式和利用链，如果有想进一步了解该漏洞细节、分析该漏洞的读者朋友请联系笔者交流，关于该栈溢出漏洞的利用方式笔者将会后续在下文 Further Research 栏目更新
 
 好久没发了，还是更新一下吧
 
 # [](#header-3)A report on the StackOverflow vulnerability of QTS 5.1.8.2823
 
 Vulnerability Product: QTS 5.1.8.2823  
-Vulnerability type: StackOverflow / Further harm  
-Vulnerability Authentication Requirement: Low privilege
+Vulnerability Type: StackOverflow / Further harm  
+Vulnerability Authentication Requirement: Low privilege  
+Exploitation Method: Remote  
 
 There is a StackOverflow vulnerability in the QTS 5.1.8.2823. When an attacker has a low privilege account of the system, the attacker could upload a qdff and mount it, then call "unmount_qdff" and use some specific methods and parameters to cause a StackOverflow vulnerability
 
