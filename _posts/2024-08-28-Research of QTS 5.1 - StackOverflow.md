@@ -31,7 +31,9 @@ Special thanks to the TS-212P3 device provided by the NSFOCUS GeWu IoT Security 
 
 ## [](#header-3)AUDIT:
 
-There are several functions mentioned below. Let me first explain their uses:  
+To be honest, I don't know why this vulnerability exists until now. Perhaps it's because previous researchers haven't discovered how it can be exploited (when I was researching this sink, I was also hesitant about whether there was an exact path for malicious payloads to reach the sink)
+
+Let's get start: There are several functions mentioned below. Let me first explain their uses:  
 sub_10B3F8: The entrance of "unmount_qdff", Here in after referred to as "unmount_qdff"  
 sub_10B350: Function used to unmount qdff  
 sub_BE8B4: Used to determine whether qdff is loaded and decide whether to call sub_10B350. This is the first function that needs to be bypass  
@@ -69,12 +71,12 @@ Finally execute sprintf and successfully StackOverflow(If you add enough '/', 10
 ![/image/resources/1.png](/image/resources/qts_2.png)
 ![/image/resources/1.png](/image/resources/qts_3.png)
 
-Here parameters are formatted into a string by using the sprintf function.
+Here parameters are formatted into a string by using the sprintf function. We can intuitively observe that the declared stack array v3 only has 2048 bytes, so we only need to input more bytes to cause stack overflow
 
 ![/image/resources/1.png](/image/resources/qts_9.png)
 
 
-The premise of all the above operations is that the qdff has been mounted, because in sub_BE8B4 or Delete_QDFF_Share, they will always check whether the qdff is mounted.
+The premise of all the above operations is that the qdff has been mounted, because in sub_BE8B4 or Delete_QDFF_Share, they will always check whether the qdff is mounted. But actually after performing the operation, the mounted files will not actually be deleted after we call "unmount_qdff" in payload(due to the incorrect logical writing of the detection function, they will not be deleted. This will not be repeated here)
 
 ![/image/resources/1.png](/image/resources/qts_7.png)
 ![/image/resources/1.png](/image/resources/qts_10.png)
@@ -128,6 +130,13 @@ The premise of all the above operations is that the qdff has been mounted, becau
 ## [](#header-3)HARM: 
 
 A low privileged attacker could manipulate the qdff folder name to redirect the current function to the address corresponding to the qdff folder name, Even causing RCE
+
+A simple explain: if there is a mounted qdff folder which name is "asdf00000000##! ", and if the data "##! " being written at the return address of a certain function, then the function will jump to address 0x20212323
+
+```python
+#this is just a simple example, not applicable to any chip architecture
+'/' * 10000 + "asdf00000000##! "
+```
 
 ## [](#header-3)Further Research
 
