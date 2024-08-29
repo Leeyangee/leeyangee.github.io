@@ -13,7 +13,6 @@ fofa语法:
 ```fofa
 app="QNAP-NAS"
 ```
-(粗略估计仅有 1/2 至 1/10 的资产为能复现该漏洞的正常系统，如果需要拿到低权限则估计还需要在该基础上乘以 1/10)
 
 # [](#header-3)A report on the StackOverflow vulnerability of QTS 5.1.8.2823
 
@@ -24,7 +23,7 @@ Exploitation Method: Remote
 
 There is a StackOverflow vulnerability in the QTS 5.1.8.2823. When an attacker has a low privilege account of the system, the attacker could upload a qdff and mount it, then call "unmount_qdff" and use some specific methods and parameters to cause a StackOverflow vulnerability
 
-## [](#header-3)THANKS:
+## [](#header-3)Special Thanks:
 
 Special thanks to the TS-212P3 device provided by the NSFOCUS GeWu IoT Security Lab , and the QTS operating system firmware reverse analysis method on the public forum, which enabled me to discover this vulnerability.
 
