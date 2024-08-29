@@ -9,6 +9,12 @@ published: true
 
 好久没发了，还是更新一下吧
 
+fofa语法:  
+```fofa
+app="QNAP-NAS"
+```
+(粗略估计仅有 1/2 至 1/10 的资产为能复现该漏洞的正常系统，如果需要拿到低权限则估计还需要在该基础上乘以 1/10)
+
 # [](#header-3)A report on the StackOverflow vulnerability of QTS 5.1.8.2823
 
 Vulnerability Product: QTS 5.1.8.2823  
@@ -33,6 +39,10 @@ sub_BE8B4: Used to determine whether qdff is loaded and decide whether to call s
 Delete_QDFF_Share: Used to determine whether the qdff unmount is successful and decide whether to call sprintf. This is the second function that needs to be bypass
 
 There is a sprintf was found in the function: "sub_10B350", and the "sub_10B350" is called by "unmount_qdff", The "unmount_qdff" retrieves the value of parameter "share" and assigns it to the variable a1 and checks whether qdff has been mounted into the system and unmount the qdff 
+
+Further searching for the string, we can find that the code snippet for "unmount_qdff" is located in "share.cgi"
+
+![/image/resources/1.png](/image/resources/qts_12.png)
 
 A standard POST request that can enter "unmount_qdff" interface is as follows
 
@@ -68,6 +78,7 @@ Here parameters are formatted into a string by using the sprintf function.
 The premise of all the above operations is that the qdff has been mounted, because in sub_BE8B4 or Delete_QDFF_Share, they will always check whether the qdff is mounted.
 
 ![/image/resources/1.png](/image/resources/qts_7.png)
+![/image/resources/1.png](/image/resources/qts_10.png)
 
 ## [](#header-3)PROVE: 
 
@@ -120,6 +131,10 @@ The premise of all the above operations is that the qdff has been mounted, becau
 A low privileged attacker could manipulate the qdff folder name to redirect the current function to the address corresponding to the qdff folder name, Even causing RCE
 
 ## [](#header-3)Further Research
+
+Unfortunately, more time is needed to bypass these stack protections, and further analysis of this vulnerability will continue to be shared here
+
+![/image/resources/1.png](/image/resources/qts_11.png)
 
 ## [](#header-3)Info
 
