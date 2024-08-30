@@ -41,7 +41,7 @@ Delete_QDFF_Share: Used to determine whether the qdff unmount is successful and 
 
 There is a sprintf was found in the function: "sub_10B350", and the "sub_10B350" is called by "unmount_qdff", The "unmount_qdff" retrieves the value of parameter "share" and assigns it to the variable a1 and checks whether qdff has been mounted into the system and unmount the qdff 
 
-Further searching for the string, we can find that the code snippet for "unmount_qdff" is located in "share.cgi"
+Further searching for the string, we can find that the code snippet for "unmount_qdff" is located in "share.cgi" (In fact, share.cgi is a soft link of utilRequest.cgi, and the one that is actually analyzed is utilRequest.cgi)
 
 ![/image/resources/1.png](/image/resources/qts_12.png)
 
@@ -199,7 +199,11 @@ After the compilation is complete, transfer it into the QTS operating system of 
 [Click Here Download env.cgi](/image/resources/env.cgi)  
 [Click Here Download gdbserver-8.3.1-aarch64-le](https://github.com/Leeyangee/gdb-static/raw/master/gdbserver-8.3.1-aarch64-le)
 
-Today sleep, further analysis of this vulnerability will continue to be shared here
+After further observation, it was found that only a few parameters were needed to make utilRequest.cgi work properly.
+
+![/image/resources/1.png](/image/resources/qts_15.png)
+
+Sleep this weekend, further analysis of this vulnerability will continue to be shared here
 
 ## [](#header-3)Info
 
