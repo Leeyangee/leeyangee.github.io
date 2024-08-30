@@ -56,6 +56,15 @@ Content-Length: 10
 share=asdf
 ```
 
+In fact, at this point, some readers will wonder whether the StackOverflow of sprintf can be triggered when the value of the share parameter is simply large enough. In fact, this is impossible. After receiving the value of the share parameter, cgi will judge according to the rules. 
+
+Here, at least two conditions must be met to trigger the StackOverflow: 
+
+1. The value in the share parameter must be the real mounted qdff folder. 
+2. The value in the share parameter must be constructed in a careful way to be large enough to trigger the stack overflow.
+
+Fortunately, I found a careful construction method in the following text
+
 ![/image/resources/1.png](/image/resources/qts_1.png)
 
 You must mount a qdff folder at first, if the name of mounted qdff folder is "asdf", you can bypass the sub_BE8B4(bypass it and step into sub_10B350) and Delete_QDFF_Share(bypass it and step into sprintf) by adding an infinite number of '/' before the "asdf" in parameter "share"(Such as "//////////////////////////////asdf")
