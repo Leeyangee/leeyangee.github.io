@@ -3,7 +3,7 @@ title: Security Research of QTS 5.1 - Low-Authed StackOverflow
 published: true
 ---
 
-就在这周笔者发现了 QTS 操作系统远程控制面板一处低权限用户的 StackOverflow 漏洞，该情况已经汇报给 QNAP 厂商 SRC 并且大范围修复
+就在这周笔者发现了 QTS 操作系统远程控制面板一处低权限用户的 栈溢出 漏洞，该情况已经汇报给 QNAP 厂商 SRC 并且大范围修复
 
 这个地方不出意外还有其他利用方式和利用链，如果有想进一步了解该漏洞细节、分析该漏洞的读者朋友请联系笔者交流，关于该栈溢出漏洞的利用方式笔者将会后续在下文 Further Research 栏目更新
 
@@ -85,7 +85,11 @@ The premise of all the above operations is that the qdff has been mounted, becau
 
 1. Firstly upload the poc.zip and unzip it(If there is already a mounted qdff, skip this step and modify the value of share)
 
-    [Download poc.zip](/image/resources/poc.zip)
+    (Actually, there is a small episode here. First of all, my machine architecture is aarch64, and the qdff folder cannot be generated. So I asked the customer service and asked for a tested x86_64 architecture machine to generate a complete qdff folder. In short, the qdff folder was successfully generated and obtained.)
+
+    ![/image/resources/1.png](/image/resources/qts_13.jpg)
+
+    [Click Here Download poc.zip](/image/resources/poc.zip)
    
     ![/image/resources/1.png](/image/resources/qts_4.png)
 
@@ -140,9 +144,62 @@ A simple explain: if there is a mounted qdff folder which name is "asdf00000000#
 
 ## [](#header-3)Further Research
 
-Unfortunately, more time is needed to bypass these stack protections, and further analysis of this vulnerability will continue to be shared here
+Unfortunately, more time is needed to bypass these stack protections
 
 ![/image/resources/1.png](/image/resources/qts_11.png)
+
+First we must compile the executable file to get the environment variables to run cgi and compile gdbserver. To compile cgi and gdbserver, a compiler(gcc, golang, java) must be installed or cross compile. To install compiler, you must have a ready-made aarch64 architecture compiler or a package manager
+
+Here I choose to install the cross gcc compiler: gcc-aarch64-linux-gnu on Kali-Linux , just run belowing cmd install and compile the C code
+
+```sh
+apt install gcc-aarch64-linux-gnu  
+#You must compile the GLIBC into the excutable file
+aarch64-linux-gnu-gcc 123.c -static
+```
+
+Then the code of 123.c is as follows, which is used to save the environment variables obtained by the current cgi to 1.txt
+
+```c
+//123.c
+//Writen by leeya_bug
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    FILE *fp;
+    FILE *file;
+    char path[1035];
+    char *filename = "1.txt";
+    fp = popen("env", "r");
+    if (fp == NULL) {
+        perror("popen");
+        return EXIT_FAILURE;
+    }
+    file = fopen(filename, "w");
+    if (file == NULL) {
+        perror("fopen");
+        pclose(fp);
+        return EXIT_FAILURE;
+    }
+    while (fgets(path, sizeof(path) - 1, fp) != NULL) {
+        fputs(path, file);
+    }
+    fclose(file);
+    pclose(fp);
+    printf("Environment variables have been saved to %s\n", filename);
+    return 0;
+}
+```
+
+After the compilation is complete, transfer it into the QTS operating system of aarch64 architecture, and it is found that it can run successfully
+
+![/image/resources/1.png](/image/resources/qts_14.png)
+
+[Click Here Download env.cgi](/image/resources/env.cgi)  
+[Click Here Download gdbserver-8.3.1-aarch64-le](https://github.com/Leeyangee/gdb-static/raw/master/gdbserver-8.3.1-aarch64-le)
+
+Today sleep, further analysis of this vulnerability will continue to be shared here
 
 ## [](#header-3)Info
 
