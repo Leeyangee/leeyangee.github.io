@@ -151,6 +151,8 @@ A simple explain: if there is a mounted qdff folder which name is "asdf00000000#
 '/' * 10000 + "asdf00000000##! "
 ```
 
+Actually here you can input the utf-8 characters to simulate any byte between 0-255, such as the bytes of string ",你" is 0xa0bde42c. By combining utf-8 letters in this way, we can simulate the values ​​of most dwords.
+
 ## [](#header-3)Further Research
 
 Unfortunately, more time is needed to bypass these stack protections
@@ -211,6 +213,14 @@ After the compilation is complete, transfer it into the QTS operating system of 
 After further observation, it was found that only a few parameters were needed to make utilRequest.cgi work properly.
 
 ![/image/resources/1.png](/image/resources/qts_15.png)
+
+1. bypass Canary:
+
+    Here is a __stack_chk_guard and __stack_chk_fail here, how can we bypass it? obviously thats not difficult: Next, I will first show how to use the dumbest random guessing method to guess the Canary value. On average, it only takes 512 times to hint the Canary value.
+
+    ![/image/resources/1.png](/image/resources/qts_16.png)
+
+    Firstly input the string: 
 
 Sleep this weekend, further analysis of this vulnerability will continue to be shared here
 
