@@ -1,6 +1,6 @@
 ---
 title: Security Research of QTS 5.1 - Low-Authed StackOverflow 
-title: 关于 QTS 5.1 操作系统的分析 - StackOverflow & 后续利用
+title: 关于 QTS 5.1 操作系统的逆向 - StackOverflow & 后续利用
 published: true
 ---
 
