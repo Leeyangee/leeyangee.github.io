@@ -1,5 +1,6 @@
 ---
 title: Security Research of QTS 5.1 - Low-Authed StackOverflow 
+title: 关于 QTS 5.1 操作系统的分析 - StackOverflow & 后续利用
 published: true
 ---
 
@@ -21,7 +22,7 @@ Vulnerability Type: StackOverflow / Further harm
 Vulnerability Authentication Requirement: Low privilege  
 Exploitation Method: Remote  
 
-There is a StackOverflow vulnerability in the QTS 5.1.8.2823. When an attacker has a low privilege account of the system, the attacker could upload a qdff and mount it, then call "unmount_qdff" and use some specific methods and parameters to cause a StackOverflow vulnerability
+There is a StackOverflow vulnerability in the QTS 5.1.8.2823. When an attacker has a low privilege account of the system, the attacker could upload a qdff and mount it, then call `unmount_qdff` and use some specific methods and parameters to cause a StackOverflow vulnerability
 
 ## [](#header-3)Special Thanks:
 
@@ -31,21 +32,21 @@ Special thanks to the TS-212P3 device provided by the NSFOCUS GeWu IoT Security 
 
 ## [](#header-3)AUDIT:
 
-To be honest, I don't know why this vulnerability exists until now. Perhaps it's because previous researchers haven't discovered how it can be exploited (when I was researching this sink, I was also hesitant about whether there was an exact path for malicious payloads to reach the sink)
+To be honest, I don't understand why this vulnerability exists until now. Perhaps it's because previous researchers haven't discovered how it can be exploited (when I was researching this sink, I was also hesitant about whether there was an exact path for malicious payloads to reach the sink)
 
 Let's get start: There are several functions mentioned below. Let me first explain their uses:  
-sub_10B3F8: The entrance of "unmount_qdff", Here in after referred to as "unmount_qdff"  
-sub_10B350: Function used to unmount qdff  
-sub_BE8B4: Used to determine whether qdff is loaded and decide whether to call sub_10B350. This is the first function that needs to be bypass  
-Delete_QDFF_Share: Used to determine whether the qdff unmount is successful and decide whether to call sprintf. This is the second function that needs to be bypass
+`sub_10B3F8`: The entrance of "unmount_qdff", Here in after referred to as `unmount_qdff`  
+`sub_10B350`: Function used to unmount qdff  
+`sub_BE8B4`: Used to determine whether qdff is loaded and decide whether to call `sub_10B350`. This is the first function that needs to be bypass  
+`Delete_QDFF_Share`: Used to determine whether the qdff unmount is successful and decide whether to call sprintf. This is the second function that needs to be bypass
 
-There is a sprintf was found in the function: "sub_10B350", and the "sub_10B350" is called by "unmount_qdff", The "unmount_qdff" retrieves the value of parameter "share" and assigns it to the variable a1 and checks whether qdff has been mounted into the system and unmount the qdff 
+There is a sprintf was found in the function: `sub_10B350`, and the `sub_10B350` is called by `unmount_qdff`, The `unmount_qdff` retrieves the value of parameter "share" and assigns it to the variable a1 and checks whether qdff has been mounted into the system and unmount the qdff 
 
-Further searching for the string, we can find that the code snippet for "unmount_qdff" is located in "share.cgi" (In fact, share.cgi is a soft link of utilRequest.cgi, and the one that is actually analyzed is utilRequest.cgi)
+Further searching for the string, we can find that the code snippet for `unmount_qdff` is located in "share.cgi" (In fact, share.cgi is a soft link of utilRequest.cgi, and the one that is actually analyzed is utilRequest.cgi)
 
 ![/image/resources/1.png](/image/resources/qts_12.png)
 
-A standard POST request that can enter "unmount_qdff" interface is as follows
+A standard POST request that can enter `unmount_qdff` interface is as follows
 
 ```http
 POST /cgi-bin/filemanager/utilRequest.cgi?func=unmount_qdff&sid={YOUR_SID} HTTP/1.1
@@ -67,7 +68,7 @@ Fortunately, I found a careful construction method in the following text
 
 ![/image/resources/1.png](/image/resources/qts_1.png)
 
-You must mount a qdff folder at first, if the name of mounted qdff folder is "asdf", you can bypass the sub_BE8B4(bypass it and step into sub_10B350) and Delete_QDFF_Share(bypass it and step into sprintf) by adding an infinite number of '/' before the "asdf" in parameter "share"(Such as "//////////////////////////////asdf")
+You must mount a qdff folder at first, if the name of mounted qdff folder is "asdf", you can bypass the `sub_BE8B4`(bypass it and step into `sub_10B350`) and `Delete_QDFF_Share`(bypass it and step into `sprintf`) by adding an infinite number of '/' before the "asdf" in parameter "share"(Such as "//////////////////////////////asdf")
 
 In a brief word, if there is a mounted qdff folder named "xxx", you can add any number of '/' in the header of parameter "share" to bypass detection, and the QTS system will mistakenly judge that "//////////////////xxx" is "xxx"
 
@@ -85,7 +86,7 @@ Here parameters are formatted into a string by using the sprintf function. We ca
 ![/image/resources/1.png](/image/resources/qts_9.png)
 
 
-The premise of all the above operations is that the qdff has been mounted, because in sub_BE8B4 or Delete_QDFF_Share, they will always check whether the qdff is mounted. But actually after performing the operation, the mounted files will not actually be deleted after we call "unmount_qdff" in payload(due to the incorrect logical writing of the detection function, they will not be deleted. This will not be repeated here)
+The premise of all the above operations is that the qdff has been mounted, because in `sub_BE8B4` or `Delete_QDFF_Share`, they will always check whether the qdff is mounted. But actually after performing the operation, the mounted files will not actually be deleted after we call `unmount_qdff` in payload(due to the incorrect logical writing of the detection function, they will not be deleted. This will not be repeated here)
 
 ![/image/resources/1.png](/image/resources/qts_7.png)
 ![/image/resources/1.png](/image/resources/qts_10.png)
@@ -280,13 +281,11 @@ After further observation, it was found that only a few parameters were needed t
 
 1. bypass Canary:
 
-    Here is a __stack_chk_guard and __stack_chk_fail here, how can we bypass it? obviously thats not difficult: Next, I will first show how to use the dumbest random guessing method to guess the Canary value. On average, it only takes 512 times to hint the Canary value.
+    Here is a __stack_chk_guard and __stack_chk_fail here, how can we bypass it? obviously thats not difficult
 
     ![/image/resources/1.png](/image/resources/qts_16.png)
 
-    Firstly input the string: 
-
-Sleep this weekend, further analysis of this vulnerability will continue to be shared here
+    further analysis of this vulnerability will continue to be shared here
 
 ## [](#header-3)Info
 
