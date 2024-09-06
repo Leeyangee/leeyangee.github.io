@@ -172,7 +172,7 @@ The premise of all the above operations is that the qdff has been mounted, becau
         '''
         Mount the foler which name is bytes
         '''
-        payload = '李'.encode('utf-8') + bytes      #'李' is just a placeholder and can theoretically be deleted.
+        payload = bytes
         res = qts_req(f'path={quote(path)}&file_name={quote(filename)}&custom_name={quote(payload)}&pwd=', 'mount_qdff')
         try:
             res1 = json.loads(res)
@@ -184,7 +184,7 @@ The premise of all the above operations is that the qdff has been mounted, becau
         '''
         Unmount the foler which name is bytes
         '''
-        payload = '李'.encode('utf-8') + bytes      #'李' is just a placeholder and can theoretically be deleted.
+        payload = bytes
         res = qts_req(f'share={quote(payload)}', 'unmount_qdff')
         try:
             res1 = json.loads(res)
