@@ -8,12 +8,14 @@ published: true
 
 这个地方不出意外还有其他利用方式和利用链，如果有想进一步了解该漏洞细节、分析该漏洞的读者朋友请联系笔者交流，关于该栈溢出漏洞的利用方式笔者将会后续在下文 Further Research 栏目更新
 
-好久没发了，还是更新一下吧
-
 fofa语法:  
 ```fofa
 app="QNAP-NAS"
 ```
+
+本文章参考了 Aliz HammonD's 在今年年初发表的 [QTS 栈溢出漏洞分析报告](https://labs.watchtowr.com/qnap-qts-qnapping-at-the-wheel-cve-2024-27130-and-friends/)中的部分利用链
+
+The article refers to some of the exploit chains in Aliz HammonD's [QTS StackOverflow vulnerability analysis report](https://labs.watchtowr.com/qnap-qts-qnapping-at-the-wheel-cve-2024-27130-and-friends/) published earlier this year.
 
 # [](#header-3)A report on the StackOverflow vulnerability of QTS 5.1.8.2823
 
@@ -278,6 +280,11 @@ After the compilation is complete, transfer it into the QTS operating system of 
 After further observation, it was found that only a few parameters were needed to make utilRequest.cgi work properly.
 
 ![/image/resources/1.png](/image/resources/qts_15.png)
+
+Here I refer to Aliz HammonD's research report, but found that the exploit chain is no longer available due to the various security measures recently added by the manufacturer
+
+[https://labs.watchtowr.com/qnap-qts-qnapping-at-the-wheel-cve-2024-27130-and-friends/](https://labs.watchtowr.com/qnap-qts-qnapping-at-the-wheel-cve-2024-27130-and-friends/)
+[https://www.seebug.org/vuldb/ssvid-99838](https://www.seebug.org/vuldb/ssvid-99838)
 
 1. bypass Canary:
 
