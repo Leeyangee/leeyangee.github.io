@@ -12,9 +12,11 @@ fofa语法:
 app="QNAP-NAS"
 ```
 
-本文章参考了 Aliz HammonD's 在今年年初发表的 [QTS 栈溢出漏洞分析报告](https://labs.watchtowr.com/qnap-qts-qnapping-at-the-wheel-cve-2024-27130-and-friends/)中的部分利用链
+本文章参考了 Aliz HammonD's 在今年年初发表的 [QTS 栈溢出漏洞分析报告](https://labs.watchtowr.com/qnap-qts-qnapping-at-the-wheel-cve-2024-27130-and-friends/) 中的部分利用链
 
 The article refers to some of the exploit chains in Aliz HammonD's [QTS StackOverflow vulnerability analysis report](https://labs.watchtowr.com/qnap-qts-qnapping-at-the-wheel-cve-2024-27130-and-friends/) published earlier this year.
+
+![/image/resources/1.png](/image/resources/qts_20.png)
 
 # [](#header-3)A report on the StackOverflow vulnerability of QTS 5.1.8.2823
 
