@@ -1,6 +1,6 @@
 ---
 title: Comfast 系列产品 /栈溢出通用利用链构造
-published: true
+published: false
 ---
 
 (未完结) Comfast 本身是个比较小众品牌，出的洞危害范围较小，其安全防御措施也较为轻松，没什么交漏洞库和提醒厂商的必要，没什么好说的.    
