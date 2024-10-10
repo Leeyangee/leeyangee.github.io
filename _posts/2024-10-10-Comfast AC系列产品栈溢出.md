@@ -49,7 +49,9 @@ aaaabaaacaaadaaaeaaafaaagaaahaaaiaaajaaakaaalaaamaaanaaaoaaapaaaqaaaraaasaaataaa
 De Bruijn 字符串的首地址为 0x2B2A655C
 
 运行到函数结束，PC跳到返回地址
+
 ![/image/cfac100_1.png](/image/cfac100_1.png)  
+
 跳到的地址 0x6361616C 正好是 caal，也正好是 De Brujin 字符串的第 244 - 248 个字节，在栈中地址为 0x2B2A6650. 接下来更改该序列：  
 1. 首先，更改栈返回地址将程序跳转至 0x2B2A6654，具体跳到哪里无所谓，只要跳到 `addiu $a0, $zero, 0x457` * 0xff 这个区间里面的任意地址就行. 
 2. 而后继续写下 0xff 个填充指令 `addiu $a0, $zero, 0x457` 用于缓冲  
@@ -77,6 +79,7 @@ data0 += b"mkdir /12345"
 (`li $a0, 0x457` 即为 `addiu $a0, $zero, 0x457`)
 
 ![/image/cfac100/2.png](/image/cfac100/2.png)  
+
 ![/image/cfac100/3.png](/image/cfac100/3.png)  
 
 不过这倒无所谓，换种方法继续构造罢了  
@@ -93,7 +96,11 @@ data0 += b"mkdir /12345"
 
 简单在 uClibc 中使用 mips gadget 找寻工具利用 mipsrop.find 了一下，发现了两条十分完美的 gadget: 
 
-1. 第一条在 uClibc 中的地址为 0x4C08，能控制 $s0 - $s7 之间的寄存器，并且其偏移地址为 0x180，远大于下下图所示的 0x12C，是十分理想的控制寄存器的 gadget.  
+`mipsrop.find("move $t9")` 
+
+![/image/cfac100/3.png](/image/cfac100/8.png)  
+
+1. 第一条在 uClibc 中的地址为 0x4C08，能控制 $s0 - $s7 之间的寄存器，并且其偏移地址为 0x180，远大于下下图所示的 0x12C，是十分理想的在此用来控制寄存器的 gadget.  
    我们先让 PC 跳到这条 gadget 的起始地址 0x4C08
    
 	![/image/cfac100/3.png](/image/cfac100/5.png)  
@@ -102,7 +109,7 @@ data0 += b"mkdir /12345"
 2. 第二条在 uClibc 中的地址为 0x53B4，首先 move $t9, $s5，而后旋即 jalr 到 $t9，我不得不承认 uClibc 中的这两条 gadget 搭配起来简直是天衣无缝.  
    我们将上面那条 gadget 的 $ra 设置为 该条 gadget 的起始地址 0x53B4，方便 PC 跳到该 gadget
    
-   ![/image/cfac100/3.png](/image/cfac100/7.png)  
+   ![/image/cfac100/3.png](/image/cfac100/7.png)     
 
 接下来写代码：首先根据偏移量，计算两条 gadget 的位置
 ```py
