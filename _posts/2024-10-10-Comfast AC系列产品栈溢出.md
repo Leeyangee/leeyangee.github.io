@@ -1,5 +1,5 @@
 ---
-title: Comfast 系列产品 /栈溢出ROP利用链构造 - 10月更新 & 已完结
+title: Comfast 系列产品 /栈溢出ROP利用链构造 - 已完结
 published: true
 ---
 
