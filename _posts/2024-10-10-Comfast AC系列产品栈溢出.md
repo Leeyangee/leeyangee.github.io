@@ -101,13 +101,18 @@ data0 += b"mkdir /12345"
 
 该固件直接加载 ld-uClibc-0.9.33.2.so，因此直接分析 uClibc 中的 ROP gadget 即可. 
 
-uClibc 中是有很多 gadget 的，简单在 uClibc 中使用 mips gadget 找寻工具利用 mipsrop.find 了一下，选了一个比较合适的 gadget. 后面又在 system 中找到了一个能够控制 $t9 和 $a0 的 gadget. 
+uClibc 中是有很多 gadget 的，简单在 uClibc 中使用 mips gadget 找寻工具利用 mipsrop.find 了一下，首先选了一个比较合适的 gadget 用来控制 $s 寄存器
 
 `mipsrop.find('jr $ra')` 
 
 ![/image/cfac100/3.png](/image/cfac100/11.png)  
 
-1. 第一条 gadget 在 uClibc 中的地址为 0x4E04，能控制 $s0 - $s7 之间的寄存器，是十分理想的在此用来控制寄存器的 gadget.  
+而后要找一段能控制 $t9 并 jalr $t9 的 gadget. 在这里，笔者首先在 uClibc 中找了一段只能控制到 jalr $t9 的 gadget (如下所示)  
+在找了几段类似的 gadget 测试后，发现在此也需要修改 $a0 寄存器的值. 于是后面直接在 system 函数正巧里找了段 既能够控制 $a0 又能控制 $t9 的 gadget. 另找的 gadget 在下面 (2.) 展示
+
+![/image/cfac100/3.png](/image/cfac100/7.png)  
+
+1. 第一条 gadget 在 uClibc 中的地址为 0x4E04，能控制 $s0 - $s7 之间的寄存器，是比较理想的在此用来控制寄存器的 gadget.  
    
 	![/image/cfac100/3.png](/image/cfac100/12.png)  
 
@@ -136,7 +141,7 @@ if True:
 	system_addr			= 0x2B4002F0
 ```
 
-接下来在填充必要字符后，写入第一个 gadget 会读取的值，再写入第二个 gadget 会读取的值(这个地方如果读者要自己尝试，建议还是用 De Bruijn 序列探测一下，以防出错)，要命令执行的字符串起始地址是 0x2B2A64D7
+在栈上填充必要字符后，写入第一个 gadget 会读取的值，再写入第二个 gadget 会读取的值 (这个地方如果读者要自己尝试，建议还是用 De Bruijn 序列探测一下，以防出错)，要命令执行的字符串起始地址是 0x2B2A64D7
 
 ```py
 #by leeya_bug
