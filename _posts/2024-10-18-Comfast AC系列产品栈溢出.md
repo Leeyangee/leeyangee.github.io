@@ -110,7 +110,7 @@ data0 += b"mkdir /12345"
 
 在这里，笔者首先在 ld-uClibc-0.9.33.2.so 中找了一段只能控制到 jalr $t9 的 gadget (如下所示)  
 
-在找了几段类似的 gadget 测试后，发现在此也需要修改 $a0 寄存器的值. 于是后面直接在 libuClibc-0.9.33.2.so 中的 system 函数正巧里找了段 既能够控制 $a0 又能控制 $t9 的 gadget. 另找的 gadget 在下面 (2.) 展示
+在找了几段类似的 gadget 测试后，发现在此也需要修改 $a0 寄存器的值. 于是后面直接在 libuClibc-0.9.33.2.so 中的 system 函数正巧里找了段 既能够控制 $a0 又能控制 $t9 的 gadget. 另找的 gadget 在下面 (3.) 展示
 
 ![/image/cfac100/3.png](/image/cfac100/7.png)  
 
@@ -141,6 +141,9 @@ data0 += b"mkdir /12345"
 	![/image/cfac100/3.png](/image/cfac100/14.png) 
 
 3. 第三条 gadget 位于 libuClibc-0.9.33.2.so 中的 system 函数附近，该 gadget 地址为 0x2B3FFFF4，首先该 gadget 从栈上获取值并赋值给 $a0，而后旋即将 $s7 赋值给 $t9，再 jalr $t9.
+
+	在这里笔者需要解释一下，$a0 从栈上获取值 0x0047c010，但实际上并不能写入 `\x00` 字节，这就意味着可能要 另找其他 gadget 适应.  
+	但实际上并不用那么复杂，由于这条 gadget 是最后一个被调用的，只需要向栈中最后三个字节写入 0x47C010，由于小端特性，这三个字节和栈外的 `\x00` 会组成 0x0047c010，因此
    
    ![/image/cfac100/3.png](/image/cfac100/10.png)     
 
