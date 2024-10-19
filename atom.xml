@@ -14,8 +14,8 @@ layout: null
       <uri>{{ site.author.url }}</uri>
     </author>
     <item>
-      <title>leeya_bug的记录 - 赛博安全研究 - CyberSecurity Learn And Research</title>
-      <description>leeya_bug的记录 - 赛博安全研究 - CyberSecurity Learn And Research</description>
+      <title>leeya_bug的记录档案 - CyberSecurity Archives</title>
+      <description>leeya_bug的记录档案 - CyberSecurity Archives</description>
       <link>https://leeyabug.top</link>
       <link href="https://leeyabug.top"/>
       <guid isPermaLink="true">https://leeyabug.top</guid>
