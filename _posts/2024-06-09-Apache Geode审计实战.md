@@ -12,7 +12,7 @@ published: true
   </td></tr>
   <tr>
     <td>
-        AGVL-01: Apache Geode Deserialization Vulnerability
+        CVE-2024-44091: Apache Geode Deserialization Vulnerability
     </td>
     <td>
         Due to the client receiving data streams from the server but processing them incorrectly during Handshake initialization, attackers can modify/forge server during this process, sending harm payload and triggering deserialization on the client(even RCE)
@@ -38,7 +38,7 @@ published: true
 | 目录跳转 |
 |--------|
 | [Apache Geode简介及背景介绍](#中间件简介及背景介绍) |
-| [AGVL-01漏洞: Apache Geode Deserialization Vulnerability](#漏洞agvl-01) |
+| [CVE-2024-44091漏洞: Apache Geode Deserialization Vulnerability](#漏洞cve-2024-44091) |
 | [AGVL-02漏洞: Apache Geode 集群未授权 RCE](#漏洞agvl-02) |
 | [一些个人意见](#一些个人意见) |
 
@@ -52,7 +52,7 @@ Apache Geode 的官方仓库：[https://github.com/apache/geode](https://github.
 在漏洞构造过程，笔者将会省略一些无关紧要的内容，尽量简述，更多细节请读者私下自行测试. 另外，笔者将会以普遍形式分步拆解漏洞调用路径，更便于分析
 
 
-# [](#header-31)漏洞agvl-01:
+# [](#header-31)漏洞cve-2024-44091:
 # [](#header-31)Apache Geode Deserialization Vulnerability
 
 There is a java deserialization vulnerability in the Apache Geode client. During the handshake between the client and the server, the server will send a piece of data with specific content to the client, when the server sends a piece of harmful specific serialized data, the client will incorrectly parse and deserialize the data to instance, eventually causing a remote command execution under certain circumstances.
