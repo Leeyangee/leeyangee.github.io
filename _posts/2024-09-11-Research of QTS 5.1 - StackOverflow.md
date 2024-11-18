@@ -305,5 +305,6 @@ This vulnerability was submitted for research purposes, So after QTS 5.1.8.2823 
 discovered by leeya_bug
 
 -----
-
+<!--
 于 2024 11 13日更新：某公司疑似在近期的 Pwn2Own 2024 赛事中利用了该漏洞作为 利用链入口，在情况不清楚时将不会放出更多利用链
+-->
