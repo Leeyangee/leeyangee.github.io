@@ -1,6 +1,6 @@
 ---
 title: 对 QTS 5.1 操作系统的逆向 - MemOverflow & 后续 (CVE-2024-38638)
-published: true
+published: false
 ---
 
 QTS 是一个 NAS 操作系统，是一个基于 Linux 原始内核二开的系统.  
