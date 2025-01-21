@@ -1,5 +1,5 @@
 ---
-title: Linux Kernel 驱动提权合集 - 未更完
+title: Linux Kernel 驱动提权合集 - 未完
 published: true
 ---
 
@@ -245,15 +245,18 @@ void restore_stat()
 }
 ```
 
-当调用 iretq 时，栈结构如下所示，iretq 按如下结构恢复各个寄存器的值
+当调用 iretq 时，栈结构如下所示. iretq 按如下结构恢复各个寄存器的值并返回到用户态，结束
 
 ```stack
 rsp:   rip    的值
        cs     的值
        rflags 的值
-	   sp     的值
+       sp     的值
        ss     的值
 ```
+
+那么 `commit_creds(prepare_kernel_cred(0))` 到底干了什么？`prepare_kernel_cred(0)` 这个函数会使我们分配一个新的cred结构(uid=0, gid=0等)，再使用 `commit_creds` 并且把它应用到调用进程后，此时我们就是root权限了. `commit_creds` 和 `prapare_kernel_cred` 都是内核函数,一般可以通过 `cat /proc/kallsyms` 查看他们的地址，但是必须需要root权限
+
 
 ### [](#header-3)题目 xman2019 babykernel
 
