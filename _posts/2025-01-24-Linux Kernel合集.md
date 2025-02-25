@@ -10,6 +10,7 @@ published: true
 | [关于内核态的保护及常见绕过办法](#关于内核态的保护及常见绕过办法) |
 | [什么是 save_stat 和 restore_stat，以及如何提权](#什么是save_stat和restore_stat以及如何提权) |
 | [题目 xman2019 babykernel](#题目-xman2019-babykernel) |
+| [题目 强网杯2018 - Core](#题目-qwb2018-core) |
 
 在 Linux 操作系统中 CPU 的特权级别分为四个等级：  
 Ring 0、Ring 1、Ring 2、Ring 3
@@ -465,6 +466,6 @@ exploit(r)
 本篇文章参考了:  
 [Linux Kernel Pwn 初探 - T3LS](https://xz.aliyun.com/t/7625)
 
-### [](#header-3)题目：xman2020 level2
+### [](#header-3)题目 qwb2018 core
 
 (未完)
