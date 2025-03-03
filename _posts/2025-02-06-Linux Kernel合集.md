@@ -247,6 +247,8 @@ void restore_stat()
 }
 ```
 
+那swapgs 和 iretq 是干嘛的呢？  
+
 当调用 swapgs 时，内核通过 swapgs 将用户态 GS 基址保存到 MSR，并加载内核的 GS 基址. 一个正常业务中的 syscall 的 gs 切换逻辑如下所示
 
 ```asm
@@ -261,10 +263,6 @@ sysretq						//返回用户态
 
 当调用 iretq 时，栈结构如下所示. iretq 按如下结构恢复各个寄存器的值并返回到用户态，结束. 
 
-为什么 syscall 不使用 iretq 而使用 sysretq？  
-因为 int 0x80、iretq 用于较为复杂的中断、异常或任务切换的返回，是一种需要从堆栈恢复上下文的切换.  
-而 syscall、iretq 是专门为快速系统调用设计的指令，比 int 0x80 和 iretq 更高效. syscall、sysretq 不涉及堆栈切换(RSP 和 SS) 
-
 ```stack
 rsp:   rip    的值
        cs     的值
@@ -272,6 +270,10 @@ rsp:   rip    的值
        sp     的值
        ss     的值
 ```
+
+为什么 syscall 不使用 iretq 而使用 sysretq？  
+因为 int 0x80、iretq 用于较为复杂的中断、异常或任务切换的返回，是一种需要从堆栈恢复上下文的切换.  
+而 syscall、iretq 是专门为快速系统调用设计的指令，比 int 0x80 和 iretq 更高效. syscall、sysretq 不涉及堆栈切换(仅 RSP 和 SS) 
 
 那么 `commit_creds(prepare_kernel_cred(0))` 到底干了什么？`prepare_kernel_cred(0)` 这个函数会使我们分配一个新的cred结构(uid=0, gid=0等)，再使用 `commit_creds` 并且把它应用到调用进程后，此时我们就是root权限了. `commit_creds` 和 `prapare_kernel_cred` 都是内核函数，一般可以通过 `cat /proc/kallsyms` 查看他们的地址，但是必须需要root权限
 
@@ -325,7 +327,8 @@ buf[i ++] = &templine;
 
 ![qwb](/image/kernelpwn/2.png)  
 
-payload:  
+### [](#header-3)EXP
+
 ```c
 #define _GNU_SOURCE
 #include <sys/mman.h>
@@ -534,7 +537,7 @@ ioctl(fd, 0x6677889B, ioctl_res);
 
 ##### [](#header-3) DEBUG
 
-如果要 debug `core_ioctl` 函数，只需要搜索 该函数的前几个字节，然后对该地址打断点即可. 如下所示
+对于 core 中的函数，如果要 debug `core_ioctl` 函数，只需要搜索 该函数的前几个字节，然后对该地址打断点即可. 如下所示
 
 ```
 search -t qword 0x48536677889bfe81
@@ -542,7 +545,28 @@ search -t qword 0x48536677889bfe81
 
 ![qwb](/image/kernelpwn/13.png)  
 
-payload:  
+其计算方法如下所示：  
+```py
+import os
+
+# search -t qword 0x48536677889bfe81
+core_ioctl_addr = [这里输入 pwndbg 搜索结果]
+
+core_base       = core_ioctl_addr - 0x15f
+core_release    = core_base + 0x0
+core_write      = core_base + 0x11
+core_read       = core_base + 0x63
+core_copy_func  = core_base + 0xf6
+core_ioctl      = core_base + 0x15f
+init_module     = core_base + 0x1b9
+```
+
+### [](#header-3)EXP
+
+请注意，在这里笔者只找到了 swapgs popfq ret 的链子，因此需要多放置一个空数在栈上哦！
+
+![qwb](/image/kernelpwn/14.png)  
+
 ```c
 #define _GNU_SOURCE
 #include <sys/mman.h>
