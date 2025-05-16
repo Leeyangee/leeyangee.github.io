@@ -1,6 +1,6 @@
 ---
 title: Comfast 系列产品 /栈溢出ROP利用链构造 - Updated
-published: true
+published: false
 ---
 
 Comfast 本身是个比较小众品牌，出的洞危害范围较小，其安全防御措施也较为轻松.  
