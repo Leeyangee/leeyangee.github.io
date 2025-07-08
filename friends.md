@@ -10,6 +10,9 @@ title: 朋友们
           border-top: 1px solid #000000;border: 1px solid #000000;;margin: 0 auto;
           text-align: left;" border="1">
         <tr class="foot-tr">
+          <td class="foot-tr"><a class="foot-a" href="https://hedgeho9.cn">hedgeho9 的博客</a></td>
+        </tr>
+        <tr class="foot-tr">
           <td class="foot-tr"><a class="foot-a" href="https://buutt3rf1y.github.io/">butt3rf1y 的博客</a></td>
         </tr>
         <tr class="foot-tr">
