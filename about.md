@@ -11,10 +11,10 @@ leeya_bug、leeyange
 
 |||
 | --- | --- |
-| 2025.4 ~ 至今 | &nbsp;- IoT 安全研究员 |
+| 2025.4 ~ 至今 | &nbsp;- 二进制安全研究员 |
 | 2024.7 ~ 2024.12 | 绿盟格物实验室 - 安全研究员 |
 | 2022.5 ~ 2023.5  | SCP:SL 服务器 - 基于 C# 的插件开发和维护 |
-| 2021.9 ~ 至今 | 西南某双非CS 软件工程系 - 学生 |
+| 2021.9 ~ 2025.6 | 西南某双非CS 软件工程系 - 学生 |
 
 
 擅长使用Go、Python等轻量编程语言开发，擅长传统架构的代码审计、逆向和渗透测试.  
@@ -32,7 +32,8 @@ Steam 总游戏时长 2500小时、SCP:SL 1000小时、Steallaris(群星) 250小
 欢迎志同道合的朋友同我一起深入探讨相关领域的技术细节  
 以及帮助优化、改进网站或工具  
 
-邮箱：<a href="mailto:leeyang928320@gmail.com">leeyang928320@gmail.com</a>  
+邮箱：<a href="mailto:leeyang928320@gmail.com">leeya_bug@leeyabug.top</a>  
+<a href="mailto:leeyang928320@gmail.com">leeyang928320@gmail.com</a>  
 
 汇款/赞助地址：  
 USDT-ERC20: 0x46f89d7279e043694149503b6f922e5fbb052971  
