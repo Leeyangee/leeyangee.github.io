@@ -6,8 +6,10 @@ layout: default_special
     {% for post in paginator.posts %}
       <li>
           <h2><a style="text-decoration: none;color: #2bbc8a;" href="{{ post.url | prepend: site.baseurl | replace: '//', '/' }}">{{ post.title }}</a></h2>
-          <time datetime="{{ post.date | date_to_xmlschema }}"> {{ post.date | date: '发表于: %Y-%m-%d' }}</time>
-          <p>{{ post.content | strip_html | truncatewords:2 }}</p>
+          {% unless post.special %}
+            <time datetime="{{ post.date | date_to_xmlschema }}"> {{ post.date | date: '发表于: %Y-%m-%d' }}</time>
+            <p>{{ post.content | strip_html | truncatewords:2 }}</p>
+          {% endunless %}
       </li>
     {% endfor %}
 </ul>
